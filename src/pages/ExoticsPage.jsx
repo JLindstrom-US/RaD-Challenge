@@ -23,7 +23,7 @@ function CounterRow({ label, value, onAdd, onRemove, note }) {
 function WheelTile({ title, url, description }) {
   return (
     <a className="wheel-tile" href={url} target="_blank" rel="noopener noreferrer">
-      <span className="wheel-kicker">External link</span>
+      <span className="wheel-kicker">External Link</span>
       <strong>{title}</strong>
       <span>{description}</span>
       <span className="wheel-url">{url}</span>
@@ -43,11 +43,11 @@ export default function ExoticsPage({ nav, exotics, setExotics }) {
     <Layout
       nav={nav}
       eyebrow="Exotics"
-      title="Exotic Wheels and Rewards"
-      intro="Track wheel costs, dismantles, and Dual Destiny completions here."
+      title="Exotic Redemptions"
+      intro="Spend Marks to Unlock Exotics, Earn Marks for Dismantling Exotics"
     >
       <section className="panel activity-panel">
-        <h2>Wheel links</h2>
+        <h2>Wheels</h2>
         <div className="wheel-grid">
           <WheelTile
             title="Exotic Weapon Wheel"
@@ -63,19 +63,19 @@ export default function ExoticsPage({ nav, exotics, setExotics }) {
       </section>
 
       <section className="panel activity-panel">
-        <h2>Exotic costs</h2>
+        <h2>Exotic Tracking</h2>
         <div className="counter-stack">
           <CounterRow
             label="Exotic Weapons"
             value={weaponCount}
-            note="5 Marks each"
+            note="5 Marks Each"
             onAdd={() => update({ weaponCount: weaponCount + 1 })}
             onRemove={() => update({ weaponCount: Math.max(0, weaponCount - 1) })}
           />
           <CounterRow
             label="Exotic Armor"
             value={armorCount}
-            note="5 Marks each"
+            note="5 Marks Each"
             onAdd={() => update({ armorCount: armorCount + 1 })}
             onRemove={() => update({ armorCount: Math.max(0, armorCount - 1) })}
           />
@@ -83,19 +83,19 @@ export default function ExoticsPage({ nav, exotics, setExotics }) {
       </section>
 
       <section className="panel activity-panel">
-        <h2>Bonus marks</h2>
+        <h2>Extra Redemptions</h2>
         <div className="counter-stack">
           <CounterRow
             label="Dismantled Exotics"
             value={dismantledCount}
-            note="Adds 1 mark each"
+            note="Adds 1 Mark Each"
             onAdd={() => update({ dismantledCount: dismantledCount + 1 })}
             onRemove={() => update({ dismantledCount: Math.max(0, dismantledCount - 1) })}
           />
           <CounterRow
             label="Dual Destiny"
             value={dualDestinyCount}
-            note="Each completion removes 5 marks"
+            note="5 Marks Each"
             onAdd={() => update({ dualDestinyCount: dualDestinyCount + 1 })}
             onRemove={() => update({ dualDestinyCount: Math.max(0, dualDestinyCount - 1) })}
           />

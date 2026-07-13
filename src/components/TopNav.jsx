@@ -14,8 +14,8 @@ export default function TopNav({ availableMarks = 0 }) {
       <div className="brand-lockup">
         <span className="brand-mark" aria-hidden="true" />
         <div>
-          <p className="brand-kicker">RaD Challenge</p>
-          <p className="brand-sub">Destiny-inspired tracker</p>
+          <p className="brand-kicker">RaD Experience</p>
+          <p className="brand-sub">Raid and Dungeon Challenge Tracker</p>
         </div>
       </div>
       <nav className="tabs" aria-label="Primary">

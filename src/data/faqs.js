@@ -14,4 +14,29 @@ export const faqs = [
     answer:
       'Yes. Your selected goal, ruleset, unlocks, completions, and other tracker state are saved locally in your browser.'
   }
+  {
+    question: 'Do my selections save when I close the site?',
+    answer:
+      'Yes. Your selected goal, ruleset, unlocks, completions, and other tracker state are saved locally in your browser.'
+  }
+  {
+    question: 'Do my selections save when I close the site?',
+    answer:
+      'Yes. Your selected goal, ruleset, unlocks, completions, and other tracker state are saved locally in your browser.'
+  }
+  {
+    question: 'Do my selections save when I close the site?',
+    answer:
+      'Yes. Your selected goal, ruleset, unlocks, completions, and other tracker state are saved locally in your browser.'
+  }
+  {
+    question: 'Do my selections save when I close the site?',
+    answer:
+      'Yes. Your selected goal, ruleset, unlocks, completions, and other tracker state are saved locally in your browser.'
+  }
+  {
+    question: 'Do my selections save when I close the site?',
+    answer:
+      'Yes. Your selected goal, ruleset, unlocks, completions, and other tracker state are saved locally in your browser.'
+  }
 ]

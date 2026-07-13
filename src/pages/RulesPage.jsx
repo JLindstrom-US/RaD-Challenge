@@ -4,8 +4,8 @@ import { rules, goals } from '../data'
 import { faqs } from '../data/faqs'
 
 const rulesetOptions = [
-  { id: 'default', label: 'Default Ruleset', description: 'Basic fresh-character rules.' },
-  { id: 'expert', label: 'Expert Ruleset', description: 'Adds subclass, relic, and exotic gates.' }
+  { id: 'default', label: 'Default Ruleset', description: 'Basic Fresh-Character Rules.' },
+  { id: 'expert', label: 'Expert Ruleset', description: 'Adds Subclass, Relic, and Exotic Restrictions.' }
 ]
 
 export default function RulesPage({
@@ -21,8 +21,8 @@ export default function RulesPage({
     <Layout
       nav={nav}
       eyebrow="Rules"
-      title="Choose your challenge"
-      intro="Pick a goal and ruleset. Your selection is saved automatically and restored when you return."
+      title="Choose Your Challenge"
+      intro="Pick a Goal and Ruleset."
     >
       <section className="panel activity-panel">
         <h2>Select Your Goal</h2>
@@ -62,7 +62,7 @@ export default function RulesPage({
       </section>
 
       <section className="panel activity-panel">
-        <h2>Selected rules</h2>
+        <h2>Selected Rules</h2>
         <p className="section-text">
           Goal: <strong>{selectedDifficulty}</strong> · Ruleset: <strong>{selectedRuleset}</strong>
         </p>

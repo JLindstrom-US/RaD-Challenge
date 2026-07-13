@@ -14,7 +14,7 @@ function ActivityList({ title, items, completions }) {
               <span>{item.name}</span>
               <div className="activity-meta">
                 <strong>{item.marks} marks</strong>
-                <span className="completion-count">{count} completions</span>
+                <span className="completion-count">{count} Completions</span>
               </div>
             </article>
           )
@@ -53,13 +53,13 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
       nav={nav}
       eyebrow="Activities"
       title="Raids and Dungeons"
-      intro="Select an activity, then add completions. First clears are full value and repeats are worth half."
+      intro="Select an Activity, then Add Completions. First Clears are Full Value and Repeats are Worth Half."
     >
       <section className="panel activity-panel">
-        <h2>Completion tracker</h2>
+        <h2>Completion Tracker</h2>
         <div className="tracker-grid tracker-grid-simple">
           <label className="field">
-            <span>Select activity</span>
+            <span>Select Activity</span>
             <select value={selected} onChange={(e) => setSelected(e.target.value)}>
               {allActivities.map((activity) => (
                 <option key={activity.name} value={activity.name}>
@@ -74,8 +74,8 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
               Add Completion
             </button>
             <div className="tracker-stat">
-              <span>Selected value</span>
-              <strong>{selectedActivity ? `${selectedActivity.marks} marks` : '—'}</strong>
+              <span>Selected Value</span>
+              <strong>{selectedActivity ? `${selectedActivity.marks} Marks` : '—'}</strong>
             </div>
           </div>
         </div>

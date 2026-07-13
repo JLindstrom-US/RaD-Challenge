@@ -82,16 +82,13 @@ function SubclassGroup({ subclassUnlocks, freeSubclassName, setSubclassState }) 
 
     if (name === 'Prismatic') return '10 Marks'
     if (checked && freeSubclassName === name) return 'Free'
-    if (!checked && checkedCount === 0 && freeEligible.includes(name)) return 'Free first unlock'
+    if (!checked && checkedCount === 0 && freeEligible.includes(name)) return 'Free First Unlock'
     return '5 Marks'
   }
 
   return (
     <section className="panel activity-panel">
       <h2>Subclasses</h2>
-      <p className="section-text">
-        Unlock all 6 if you want. If none are checked, the first Solar, Arc, Void, Stasis, or Strand you unlock is free. Prismatic always costs 10 Marks.
-      </p>
       <div className="unlock-list">
         {unlockGroups.subclasses.map((item) => {
           const checked = Boolean(subclassUnlocks[item.name])
@@ -128,8 +125,8 @@ export default function UnlocksPage({
     <Layout
       nav={nav}
       eyebrow="Unlocks"
-      title="Relics and Subclasses"
-      intro="Check an unlock to remove its points. Subclasses can all be unlocked, and the first eligible one is free if none are currently selected."
+      title="Unlockables"
+      intro="Spend Marks to Unlock Relic Slots, Subclasses, Aspect Slots, and Fragment Slots"
     >
       <section className="unlock-grid">
         <UnlockGroup

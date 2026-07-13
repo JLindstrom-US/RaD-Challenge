@@ -1,3 +1,4 @@
 # RaD-Challenge
-HTML for Destiny 2 RaD Challenge
-Currently in Testing Phase
+Tracker and Ruleset for the Destiny 2 Raid & Dungeon Challenge.
+
+Probably Never going to update this README.

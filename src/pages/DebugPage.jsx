@@ -65,13 +65,13 @@ export default function DebugPage({
       intro="Use this page to override total points or fully reset the tracker."
     >
       <section className="panel activity-panel">
-        <h2>Manual point override</h2>
+        <h2>Manual Point Override</h2>
         <p className="section-text">
-          Override status: <strong>{pointOverrideEnabled ? 'Enabled' : 'Disabled'}</strong>
+          Override Status: <strong>{pointOverrideEnabled ? 'Enabled' : 'Disabled'}</strong>
         </p>
         <div className="debug-actions">
           <label className="field">
-            <span>Total points</span>
+            <span>Total Points</span>
             <input
               type="number"
               value={value}
