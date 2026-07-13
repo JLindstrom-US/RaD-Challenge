@@ -61,21 +61,21 @@ export default function DebugPage({
   }
 
   const adjustCompletion = (name, delta) => {
-  setCompletions((prev) => {
-    const current = Number(prev?.[name] || 0)
-    const next = Math.max(0, current + delta)
+    setCompletions((prev) => {
+      const current = Number(prev?.[name] || 0)
+      const next = Math.max(0, current + delta)
 
-    if (next === 0) {
-      const updated = { ...(prev || {}) }
-      delete updated[name]
-      return updated
-    }
+      if (next === 0) {
+        const updated = { ...(prev || {}) }
+        delete updated[name]
+        return updated
+      }
 
-    return {
-      ...(prev || {}),
-      [name]: next
-    }
-  })
+      return {
+        ...(prev || {}),
+        [name]: next
+      }
+    })
   }
 
   return (
@@ -90,6 +90,7 @@ export default function DebugPage({
         <p className="section-text">
           Override Status: <strong>{pointOverrideEnabled ? 'Enabled' : 'Disabled'}</strong>
         </p>
+
         <div className="debug-actions">
           <label className="field">
             <span>Total Points</span>
@@ -100,69 +101,72 @@ export default function DebugPage({
               placeholder="Enter total points"
             />
           </label>
+
           <button className="primary-button" type="button" onClick={applyOverride}>
             Set Total Points
           </button>
+
           <button className="secondary-button" type="button" onClick={disableOverride}>
             Return to Calculated Total
           </button>
+
           <button className="danger-button" type="button" onClick={resetEverything}>
             Reset Everything
           </button>
         </div>
       </section>
+
+      <section className="panel activity-panel">
+        <h2>Adjust Activity Completions</h2>
+        <p className="section-text">
+          Adjust the completion counts below.
+        </p>
+
+        <div className="debug-counter-list">
+          {[...activities]
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((activity) => {
+              const count = Number(completions?.[activity.name] || 0)
+
+              return (
+                <div className="debug-counter-row" key={activity.name}>
+                  <div className="debug-counter-copy">
+                    <span className="debug-counter-name">{activity.name}</span>
+                    <span className="debug-counter-meta">{activity.marks} Marks</span>
+                  </div>
+
+                  <div className="debug-stepper">
+                    <button
+                      type="button"
+                      className="stepper-button"
+                      onClick={() => adjustCompletion(activity.name, -1)}
+                      aria-label={`Decrease completions for ${activity.name}`}
+                    >
+                      -
+                    </button>
+
+                    <input
+                      className="stepper-value"
+                      type="number"
+                      value={count}
+                      readOnly
+                      aria-label={`Completions for ${activity.name}`}
+                    />
+
+                    <button
+                      type="button"
+                      className="stepper-button"
+                      onClick={() => adjustCompletion(activity.name, 1)}
+                      aria-label={`Increase completions for ${activity.name}`}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+        </div>
+      </section>
     </Layout>
   )
-
-  <section className="panel activity-panel">
-  <h2>Adjust Activity Completions</h2>
-  <p className="section-text">
-    Adjust The Completion Counts Below.
-  </p>
-
-  <div className="debug-counter-list">
-    {[...activities]
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((activity) => {
-        const count = Number(completions?.[activity.name] || 0)
-
-        return (
-          <div className="debug-counter-row" key={activity.name}>
-            <div className="debug-counter-copy">
-              <span className="debug-counter-name">{activity.name}</span>
-              <span className="debug-counter-meta">{activity.marks} Marks</span>
-            </div>
-
-            <div className="debug-stepper">
-              <button
-                type="button"
-                className="stepper-button"
-                onClick={() => adjustCompletion(activity.name, -1)}
-                aria-label={`Decrease completions for ${activity.name}`}
-              >
-                -
-              </button>
-
-              <input
-                className="stepper-value"
-                type="number"
-                value={count}
-                readOnly
-                aria-label={`Completions for ${activity.name}`}
-              />
-
-              <button
-                type="button"
-                className="stepper-button"
-                onClick={() => adjustCompletion(activity.name, 1)}
-                aria-label={`Increase completions for ${activity.name}`}
-              >
-                +
-              </button>
-            </div>
-          </div>
-        )
-      })}
-  </div>
-</section>
 }
