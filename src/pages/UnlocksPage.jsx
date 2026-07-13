@@ -1,6 +1,8 @@
 import Layout from '../components/Layout'
 import { unlockGroups } from '../data'
 
+const freeEligible = ['Solar', 'Arc', 'Void', 'Stasis', 'Strand']
+
 function UnlockGroup({ title, groupKey, items, unlocks, setUnlocks }) {
   const toggle = (index) => {
     const key = `${groupKey}:${index}`
@@ -38,14 +40,10 @@ function UnlockGroup({ title, groupKey, items, unlocks, setUnlocks }) {
   )
 }
 
-function SubclassGroup({ subclassUnlocks, freeSubclassUsed, setSubclassState }) {
-  const freeEligible = ['Solar', 'Arc', 'Void', 'Stasis', 'Strand']
-
-  const totalChecked = Object.values(subclassUnlocks || {}).filter(Boolean).length
+function SubclassGroup({ subclassUnlocks, freeSubclassName, setSubclassState }) {
+  const checkedCount = Object.values(subclassUnlocks || {}).filter(Boolean).length
 
   const toggleSubclass = (name) => {
-    const isUnlocked = Boolean(subclassUnlocks[name])
-
     setSubclassState((prev) => {
       const currentUnlocks = prev.subclassUnlocks || {
         Solar: false,
@@ -55,36 +53,36 @@ function SubclassGroup({ subclassUnlocks, freeSubclassUsed, setSubclassState }) 
         Strand: false,
         Prismatic: false
       }
-      const activeCount = Object.values(currentUnlocks).filter(Boolean).length
-      const turningOn = !currentUnlocks[name]
+      const currentlyChecked = Boolean(currentUnlocks[name])
+      const nextUnlocks = {
+        ...currentUnlocks,
+        [name]: !currentlyChecked
+      }
 
-      if (!turningOn) {
+      if (currentlyChecked) {
+        const anyStillChecked = Object.values(nextUnlocks).some(Boolean)
         return {
-          subclassUnlocks: {
-            ...currentUnlocks,
-            [name]: false
-          },
-          freeSubclassUsed: activeCount - 1 > 0 ? prev.freeSubclassUsed : false
+          subclassUnlocks: nextUnlocks,
+          freeSubclassName: anyStillChecked ? prev.freeSubclassName : null
         }
       }
 
-      const isFreeEligible = freeEligible.includes(name)
-      const shouldBeFree = isFreeEligible && activeCount === 0 && !prev.freeSubclassUsed
+      const noSubclassesWereChecked = !Object.values(currentUnlocks).some(Boolean)
+      const shouldBecomeFree = noSubclassesWereChecked && freeEligible.includes(name)
 
       return {
-        subclassUnlocks: {
-          ...currentUnlocks,
-          [name]: true
-        },
-        freeSubclassUsed: prev.freeSubclassUsed || shouldBeFree
+        subclassUnlocks: nextUnlocks,
+        freeSubclassName: shouldBecomeFree ? name : prev.freeSubclassName
       }
     })
   }
 
   const getCostLabel = (name) => {
+    const checked = Boolean(subclassUnlocks[name])
+
     if (name === 'Prismatic') return '10 Marks'
-    if (subclassUnlocks[name]) return freeSubclassUsed ? '5 Marks' : 'Free'
-    if (totalChecked === 0 && freeEligible.includes(name)) return 'Free first unlock'
+    if (checked && freeSubclassName === name) return 'Free'
+    if (!checked && checkedCount === 0 && freeEligible.includes(name)) return 'Free first unlock'
     return '5 Marks'
   }
 
@@ -92,7 +90,7 @@ function SubclassGroup({ subclassUnlocks, freeSubclassUsed, setSubclassState }) 
     <section className="panel activity-panel">
       <h2>Subclasses</h2>
       <p className="section-text">
-        Unlock all 6 if you want. If none are checked, the first Solar, Arc, Void, Stasis, or Strand choice is free. Prismatic always costs 10 Marks.
+        Unlock all 6 if you want. If none are checked, the first Solar, Arc, Void, Stasis, or Strand you unlock is free. Prismatic always costs 10 Marks.
       </p>
       <div className="unlock-list">
         {unlockGroups.subclasses.map((item) => {
@@ -123,7 +121,7 @@ export default function UnlocksPage({
   unlocks,
   setUnlocks,
   subclassUnlocks,
-  freeSubclassUsed,
+  freeSubclassName,
   setSubclassState
 }) {
   return (
@@ -131,7 +129,7 @@ export default function UnlocksPage({
       nav={nav}
       eyebrow="Unlocks"
       title="Relics and Subclasses"
-      intro="Check an unlock to remove its points. Subclasses can all be unlocked, and if none are checked, the first free-eligible one is free again."
+      intro="Check an unlock to remove its points. Subclasses can all be unlocked, and the first eligible one is free if none are currently selected."
     >
       <section className="unlock-grid">
         <UnlockGroup
@@ -143,7 +141,7 @@ export default function UnlocksPage({
         />
         <SubclassGroup
           subclassUnlocks={subclassUnlocks}
-          freeSubclassUsed={freeSubclassUsed}
+          freeSubclassName={freeSubclassName}
           setSubclassState={setSubclassState}
         />
         <UnlockGroup

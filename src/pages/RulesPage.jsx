@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import Layout from '../components/Layout'
 import { rules, goals } from '../data'
+import { faqs } from '../data/faqs'
 
 const rulesetOptions = [
   { id: 'default', label: 'Default Ruleset', description: 'Basic fresh-character rules.' },
@@ -12,23 +13,9 @@ export default function RulesPage({
   selectedDifficulty,
   selectedRuleset,
   setSelectedDifficulty,
-  setSelectedRuleset,
-  faqs,
-  setFaqs
+  setSelectedRuleset
 }) {
-  const [faqQuestion, setFaqQuestion] = useState('')
-  const [faqAnswer, setFaqAnswer] = useState('')
-
   const activeRules = useMemo(() => rules[selectedRuleset] || rules.default, [selectedRuleset])
-
-  const addFaq = () => {
-    const q = faqQuestion.trim()
-    const a = faqAnswer.trim()
-    if (!q || !a) return
-    setFaqs((prev) => [...prev, { question: q, answer: a }])
-    setFaqQuestion('')
-    setFaqAnswer('')
-  }
 
   return (
     <Layout
@@ -98,29 +85,6 @@ export default function RulesPage({
               <p>{item.answer}</p>
             </details>
           ))}
-        </div>
-
-        <div className="faq-form">
-          <label className="field">
-            <span>Question</span>
-            <input
-              value={faqQuestion}
-              onChange={(e) => setFaqQuestion(e.target.value)}
-              placeholder="Add a new FAQ question"
-            />
-          </label>
-          <label className="field">
-            <span>Answer</span>
-            <textarea
-              value={faqAnswer}
-              onChange={(e) => setFaqAnswer(e.target.value)}
-              placeholder="Add the answer"
-              rows={4}
-            />
-          </label>
-          <button type="button" className="primary-button" onClick={addFaq}>
-            Add FAQ
-          </button>
         </div>
       </section>
     </Layout>

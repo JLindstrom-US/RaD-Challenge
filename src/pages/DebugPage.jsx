@@ -1,6 +1,32 @@
 import { useState } from 'react'
 import Layout from '../components/Layout'
 
+const resetState = {
+  completions: {},
+  unlocks: {},
+  subclassUnlocks: {
+    Solar: false,
+    Arc: false,
+    Void: false,
+    Stasis: false,
+    Strand: false,
+    Prismatic: false
+  },
+  freeSubclassName: null,
+  exotics: {
+    weaponCount: 0,
+    armorCount: 0,
+    dismantledCount: 0,
+    dualDestinyCount: 0,
+    weaponWheelUrl: 'https://example.com/exotic-weapon-wheel',
+    armorWheelUrl: 'https://example.com/exotic-armor-wheel'
+  },
+  pointOverrideEnabled: false,
+  pointOverrideValue: 0,
+  selectedDifficulty: 'Easy',
+  selectedRuleset: 'default'
+}
+
 export default function DebugPage({
   nav,
   pointOverrideEnabled,
@@ -26,31 +52,8 @@ export default function DebugPage({
       'Are you sure you want to reset everything? This will clear all progress and return the app to a first-time state.'
     )
     if (!ok) return
-
     localStorage.removeItem('rad-progress-v1')
-    setProgress({
-      completions: {},
-      unlocks: {},
-      subclassUnlocks: {
-        Solar: false,
-        Arc: false,
-        Void: false,
-        Stasis: false,
-        Strand: false,
-        Prismatic: false
-      },
-      freeSubclassUsed: false,
-      exotics: {
-        weaponCount: 0,
-        armorCount: 0,
-        dismantledCount: 0,
-        dualDestinyCount: 0,
-        weaponWheelUrl: 'https://example.com/exotic-weapon-wheel',
-        armorWheelUrl: 'https://example.com/exotic-armor-wheel'
-      },
-      pointOverrideEnabled: false,
-      pointOverrideValue: 0
-    })
+    setProgress(resetState)
     setValue('0')
   }
 

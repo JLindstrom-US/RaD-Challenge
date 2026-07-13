@@ -12,11 +12,41 @@ function HomeRedirect() {
   return <Navigate to="/rules" replace />
 }
 
+const defaultSubclassUnlocks = {
+  Solar: false,
+  Arc: false,
+  Void: false,
+  Stasis: false,
+  Strand: false,
+  Prismatic: false
+}
+
+const defaultExotics = {
+  weaponCount: 0,
+  armorCount: 0,
+  dismantledCount: 0,
+  dualDestinyCount: 0,
+  weaponWheelUrl: 'https://example.com/exotic-weapon-wheel',
+  armorWheelUrl: 'https://example.com/exotic-armor-wheel'
+}
+
+const defaultProgress = {
+  completions: {},
+  unlocks: {},
+  subclassUnlocks: defaultSubclassUnlocks,
+  freeSubclassName: null,
+  exotics: defaultExotics,
+  pointOverrideEnabled: false,
+  pointOverrideValue: 0,
+  selectedDifficulty: 'Easy',
+  selectedRuleset: 'default'
+}
+
 function calcActivityMarks(completions) {
   return Object.entries(completions || {}).reduce((sum, [name, count]) => {
     const activity = allActivities.find((a) => a.name === name)
     if (!activity) return sum
-    return sum + activity.marks + Math.max(0, count - 1) * (activity.marks / 2)
+    return sum + activity.marks + Math.max(0, Number(count || 0) - 1) * (activity.marks / 2)
   }, 0)
 }
 
@@ -27,24 +57,22 @@ function calcBaseUnlockMarks(unlocks) {
     if (group === 'subclasses') return sum
     const index = Number(indexString)
     const item = unlockGroups[group]?.[index]
-    return item ? sum - item.cost : sum
+    return item ? sum - Number(item.cost || 0) : sum
   }, 0)
 }
 
-function calcSubclassMarks(subclassUnlocks, freeSubclassUsed) {
+function calcSubclassMarks(subclassUnlocks, freeSubclassName) {
   const freeEligible = ['Solar', 'Arc', 'Void', 'Stasis', 'Strand']
-  let total = 0
 
-  for (const name of ['Solar', 'Arc', 'Void', 'Stasis', 'Strand', 'Prismatic']) {
-    if (!subclassUnlocks?.[name]) continue
-    if (name === 'Prismatic') {
-      total -= 10
-    } else if (freeEligible.includes(name)) {
-      total -= freeSubclassUsed && subclassUnlocks[name] === true ? 5 : 0
+  return Object.entries(subclassUnlocks || {}).reduce((sum, [name, unlocked]) => {
+    if (!unlocked) return sum
+    if (name === 'Prismatic') return sum - 10
+    if (freeEligible.includes(name)) {
+      if (name === freeSubclassName) return sum
+      return sum - 5
     }
-  }
-
-  return total
+    return sum
+  }, 0)
 }
 
 function calcExoticMarks(exotics) {
@@ -52,53 +80,26 @@ function calcExoticMarks(exotics) {
   const armorCount = Number(exotics?.armorCount || 0)
   const dismantledCount = Number(exotics?.dismantledCount || 0)
   const dualDestinyCount = Number(exotics?.dualDestinyCount || 0)
+
   return -(weaponCount * 5) - (armorCount * 5) + dismantledCount - (dualDestinyCount * 5)
 }
 
-const defaults = {
-  completions: {},
-  unlocks: {},
-  subclassUnlocks: {
-    Solar: false,
-    Arc: false,
-    Void: false,
-    Stasis: false,
-    Strand: false,
-    Prismatic: false
-  },
-  freeSubclassUsed: false,
-  exotics: {
-    weaponCount: 0,
-    armorCount: 0,
-    dismantledCount: 0,
-    dualDestinyCount: 0,
-    weaponWheelUrl: 'https://example.com/exotic-weapon-wheel',
-    armorWheelUrl: 'https://example.com/exotic-armor-wheel'
-  },
-  pointOverrideEnabled: false,
-  pointOverrideValue: 0,
-  selectedDifficulty: 'standard',
-  selectedRuleset: 'default',
-  faqs: []
-}
-
 export default function App() {
-  const [progress, setProgress] = useLocalState(STORAGE_KEY, defaults)
+  const [progress, setProgress] = useLocalState(STORAGE_KEY, defaultProgress)
 
   const completions = progress.completions || {}
   const unlocks = progress.unlocks || {}
-  const subclassUnlocks = progress.subclassUnlocks || defaults.subclassUnlocks
-  const freeSubclassUsed = Boolean(progress.freeSubclassUsed)
-  const exotics = progress.exotics || defaults.exotics
+  const subclassUnlocks = progress.subclassUnlocks || defaultSubclassUnlocks
+  const freeSubclassName = progress.freeSubclassName ?? null
+  const exotics = progress.exotics || defaultExotics
   const pointOverrideEnabled = Boolean(progress.pointOverrideEnabled)
   const pointOverrideValue = Number(progress.pointOverrideValue || 0)
-  const selectedDifficulty = progress.selectedDifficulty || defaults.selectedDifficulty
-  const selectedRuleset = progress.selectedRuleset || defaults.selectedRuleset
-  const faqs = progress.faqs || defaults.faqs
+  const selectedDifficulty = progress.selectedDifficulty || 'Easy'
+  const selectedRuleset = progress.selectedRuleset || 'default'
 
   const activityMarks = calcActivityMarks(completions)
   const baseUnlockMarks = calcBaseUnlockMarks(unlocks)
-  const subclassMarks = calcSubclassMarks(subclassUnlocks, freeSubclassUsed)
+  const subclassMarks = calcSubclassMarks(subclassUnlocks, freeSubclassName)
   const exoticMarks = calcExoticMarks(exotics)
   const computedMarks = activityMarks + baseUnlockMarks + subclassMarks + exoticMarks
   const availableMarks = pointOverrideEnabled ? pointOverrideValue : computedMarks
@@ -120,21 +121,21 @@ export default function App() {
   const setSubclassState = (updater) => {
     setProgress((prev) => {
       const current = {
-        subclassUnlocks: prev.subclassUnlocks || defaults.subclassUnlocks,
-        freeSubclassUsed: Boolean(prev.freeSubclassUsed)
+        subclassUnlocks: prev.subclassUnlocks || defaultSubclassUnlocks,
+        freeSubclassName: prev.freeSubclassName ?? null
       }
       const next = typeof updater === 'function' ? updater(current) : updater
       return {
         ...prev,
         subclassUnlocks: next.subclassUnlocks,
-        freeSubclassUsed: next.freeSubclassUsed
+        freeSubclassName: next.freeSubclassName
       }
     })
   }
 
   const setExotics = (updater) => {
     setProgress((prev) => {
-      const next = typeof updater === 'function' ? updater(prev.exotics || defaults.exotics) : updater
+      const next = typeof updater === 'function' ? updater(prev.exotics || defaultExotics) : updater
       return { ...prev, exotics: next }
     })
   }
@@ -147,19 +148,18 @@ export default function App() {
     }))
   }
 
-  const setSelectedDifficulty = (selectedDifficulty) => {
-    setProgress((prev) => ({ ...prev, selectedDifficulty }))
+  const setSelectedDifficulty = (value) => {
+    setProgress((prev) => ({
+      ...prev,
+      selectedDifficulty: value
+    }))
   }
 
-  const setSelectedRuleset = (selectedRuleset) => {
-    setProgress((prev) => ({ ...prev, selectedRuleset }))
-  }
-
-  const setFaqs = (updater) => {
-    setProgress((prev) => {
-      const next = typeof updater === 'function' ? updater(prev.faqs || []) : updater
-      return { ...prev, faqs: next }
-    })
+  const setSelectedRuleset = (value) => {
+    setProgress((prev) => ({
+      ...prev,
+      selectedRuleset: value
+    }))
   }
 
   return (
@@ -174,8 +174,6 @@ export default function App() {
             selectedRuleset={selectedRuleset}
             setSelectedDifficulty={setSelectedDifficulty}
             setSelectedRuleset={setSelectedRuleset}
-            faqs={faqs}
-            setFaqs={setFaqs}
           />
         }
       />
@@ -197,7 +195,7 @@ export default function App() {
             unlocks={unlocks}
             setUnlocks={setUnlocks}
             subclassUnlocks={subclassUnlocks}
-            freeSubclassUsed={freeSubclassUsed}
+            freeSubclassName={freeSubclassName}
             setSubclassState={setSubclassState}
           />
         }

@@ -929,3 +929,27 @@ h3 {
   gap: 12px;
   margin-top: 16px;
 }
+
+.faq-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.faq-item {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel3);
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.faq-item p {
+  margin-top: 10px;
+  color: var(--muted);
+}
