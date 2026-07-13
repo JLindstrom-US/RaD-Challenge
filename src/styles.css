@@ -35,6 +35,11 @@ body {
   letter-spacing: 0.01em;
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 h1,
 h2,
 h3,
@@ -50,7 +55,7 @@ h1 {
 }
 
 h2 {
-  font-size: clamp(1.15rem, 2vw, 1.75rem);
+  font-size: clamp(1.05rem, 2vw, 1.55rem);
   line-height: 1.05;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -65,7 +70,7 @@ h3 {
 .app-shell {
   width: min(calc(100% - 32px), var(--max));
   margin: 0 auto;
-  padding: 24px 0 56px;
+  padding: 18px 0 56px;
   display: grid;
   gap: 20px;
 }
@@ -89,8 +94,100 @@ h3 {
   pointer-events: none;
 }
 
+.topbar {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background:
+    radial-gradient(circle, rgba(212, 180, 107, 0.14), transparent 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
+  box-shadow: inset 0 0 18px rgba(212, 180, 107, 0.08);
+  position: relative;
+}
+
+.brand-mark::before,
+.brand-mark::after {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.brand-mark::after {
+  inset: 15px;
+}
+
+.brand-kicker {
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.88rem;
+}
+
+.brand-sub {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  transition: border-color 180ms ease, color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.tab:hover {
+  transform: translateY(-1px);
+  border-color: rgba(212,180,107,.18);
+  color: var(--text);
+}
+
+.tab.active {
+  color: var(--text);
+  background: rgba(212,180,107,0.12);
+  border-color: rgba(212,180,107,0.26);
+}
+
 .hero-panel {
-  padding: 36px 24px;
+  padding: 34px 24px;
+}
+
+.page-hero {
+  min-height: 0;
 }
 
 .hero-mark {
@@ -145,34 +242,6 @@ h3 {
   line-height: 1.75;
 }
 
-.hero-meta {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.hero-meta > div,
-.goal-card,
-.activity-row {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--panel3);
-}
-
-.hero-meta > div {
-  padding: 14px 16px;
-  backdrop-filter: blur(4px);
-}
-
-.meta-label {
-  display: block;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
 .content-panel,
 .activity-panel {
   padding: 24px;
@@ -210,7 +279,9 @@ h3 {
 
 .goal-card {
   padding: 18px;
-  border-color: var(--line-strong);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--panel3);
 }
 
 .goal-tier {
@@ -231,6 +302,7 @@ h3 {
   line-height: 1.6;
 }
 
+.activity-panel h2,
 .activity-panel h3 {
   margin-bottom: 14px;
 }
@@ -246,6 +318,9 @@ h3 {
   gap: 16px;
   align-items: center;
   padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel3);
 }
 
 .activity-row strong {
@@ -266,6 +341,17 @@ h3 {
 }
 
 @media (min-width: 760px) {
+  .topbar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    min-width: min(720px, 100%);
+  }
+
   .grid-two {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
