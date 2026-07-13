@@ -4,7 +4,8 @@ const links = [
   { to: '/rules', label: 'Rules' },
   { to: '/activities', label: 'Raids & Dungeons' },
   { to: '/unlocks', label: 'Unlocks' },
-  { to: '/exotics', label: 'Exotics' }
+  { to: '/exotics', label: 'Exotics' },
+  { to: '/debug', label: 'Debug' }
 ]
 
 export default function TopNav({ availableMarks = 0 }) {

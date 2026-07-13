@@ -1,19 +1,109 @@
 import Layout from '../components/Layout'
-import { exoticRules } from '../data'
 
-export default function ExoticsPage({ nav }) {
+function CounterRow({ label, value, onAdd, onRemove, note }) {
+  return (
+    <div className="exotic-row">
+      <div className="exotic-copy">
+        <span className="unlock-name">{label}</span>
+        {note ? <span className="unlock-cost">{note}</span> : null}
+      </div>
+      <div className="counter-controls">
+        <button type="button" className="secondary-button" onClick={onRemove} aria-label={`Remove one ${label}`}>
+          -
+        </button>
+        <strong className="counter-value">{value}</strong>
+        <button type="button" className="secondary-button" onClick={onAdd} aria-label={`Add one ${label}`}>
+          +
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function WheelTile({ title, url, description }) {
+  return (
+    <a className="wheel-tile" href={url} target="_blank" rel="noopener noreferrer">
+      <span className="wheel-kicker">External link</span>
+      <strong>{title}</strong>
+      <span>{description}</span>
+      <span className="wheel-url">{url}</span>
+    </a>
+  )
+}
+
+export default function ExoticsPage({ nav, exotics, setExotics }) {
+  const weaponCount = Number(exotics.weaponCount || 0)
+  const armorCount = Number(exotics.armorCount || 0)
+  const dismantledCount = Number(exotics.dismantledCount || 0)
+  const dualDestinyCount = Number(exotics.dualDestinyCount || 0)
+  const weaponCost = Number(exotics.weaponCost || 0)
+  const armorCost = Number(exotics.armorCost || 0)
+
+  const update = (patch) => {
+    setExotics((prev) => ({ ...prev, ...patch }))
+  }
+
   return (
     <Layout
       nav={nav}
       eyebrow="Exotics"
-      title="Exotic Access"
-      intro="The exotic section keeps the same visual language: dark panels, gold accents, and restrained sci-fi detail."
+      title="Exotic Wheels and Rewards"
+      intro="Track wheel costs, dismantles, and Dual Destiny completions here."
     >
-      <section className="panel content-panel">
-        <h2>Exotic rules</h2>
-        <ul className="simple-list">
-          {exoticRules.map((item) => <li key={item}>{item}</li>)}
-        </ul>
+      <section className="panel activity-panel">
+        <h2>Wheel links</h2>
+        <div className="wheel-grid">
+          <WheelTile
+            title="Exotic Weapon Wheel"
+            url={exotics.weaponWheelUrl || 'https://example.com/exotic-weapon-wheel'}
+            description="Placeholder link for the weapon wheel."
+          />
+          <WheelTile
+            title="Exotic Armor Wheel"
+            url={exotics.armorWheelUrl || 'https://example.com/exotic-armor-wheel'}
+            description="Placeholder link for the armor wheel."
+          />
+        </div>
+      </section>
+
+      <section className="panel activity-panel">
+        <h2>Exotic costs</h2>
+        <div className="counter-stack">
+          <CounterRow
+            label="Exotic Weapons"
+            value={weaponCount}
+            note={`Each costs ${weaponCost} marks`}
+            onAdd={() => update({ weaponCount: weaponCount + 1 })}
+            onRemove={() => update({ weaponCount: Math.max(0, weaponCount - 1) })}
+          />
+          <CounterRow
+            label="Exotic Armor"
+            value={armorCount}
+            note={`Each costs ${armorCost} marks`}
+            onAdd={() => update({ armorCount: armorCount + 1 })}
+            onRemove={() => update({ armorCount: Math.max(0, armorCount - 1) })}
+          />
+        </div>
+      </section>
+
+      <section className="panel activity-panel">
+        <h2>Bonus marks</h2>
+        <div className="counter-stack">
+          <CounterRow
+            label="Dismantled Exotics"
+            value={dismantledCount}
+            note="Adds 1 mark each"
+            onAdd={() => update({ dismantledCount: dismantledCount + 1 })}
+            onRemove={() => update({ dismantledCount: Math.max(0, dismantledCount - 1) })}
+          />
+          <CounterRow
+            label="Dual Destiny"
+            value={dualDestinyCount}
+            note="Each completion removes 5 marks"
+            onAdd={() => update({ dualDestinyCount: dualDestinyCount + 1 })}
+            onRemove={() => update({ dualDestinyCount: Math.max(0, dualDestinyCount - 1) })}
+          />
+        </div>
       </section>
     </Layout>
   )

@@ -1,54 +1,80 @@
+import { useMemo, useState } from 'react'
 import Layout from '../components/Layout'
-import { rules, goals, markRules } from '../data'
+import { rules } from '../data'
 
-function List({ items }) {
-  return <ul className="simple-list">{items.map((item) => <li key={item}>{item}</li>)}</ul>
-}
+const difficultyOptions = [
+  { id: 'casual', label: 'Casual', description: 'Baseline rules for a lighter run.' },
+  { id: 'standard', label: 'Standard', description: 'Balanced default challenge.' },
+  { id: 'expert', label: 'Expert', description: 'Full restrictions and harder unlock rules.' }
+]
+
+const rulesetOptions = [
+  { id: 'default', label: 'Default Ruleset', description: 'Basic fresh-character rules.' },
+  { id: 'expert', label: 'Expert Ruleset', description: 'Adds subclass, relic, and exotic gates.' }
+]
 
 export default function RulesPage({ nav }) {
+  const [difficulty, setDifficulty] = useState('standard')
+  const [ruleset, setRuleset] = useState('default')
+
+  const activeRules = useMemo(() => rules[ruleset] || rules.default, [ruleset])
+
   return (
     <Layout
       nav={nav}
       eyebrow="Rules"
-      title="Challenge Rules"
-      intro="The workbook’s baseline and expert rule sets, plus the challenge ladder that defines each run tier."
+      title="Choose your challenge"
+      intro="Pick a difficulty and ruleset. The selected cards will stand out so the current setup is always obvious."
     >
-      <section className="grid-two">
-        <article className="panel content-panel">
-          <h2>Default rules</h2>
-          <List items={rules.default} />
-        </article>
-        <article className="panel content-panel">
-          <h2>Expert rules</h2>
-          <List items={rules.expert} />
-        </article>
-      </section>
-
-      <section className="panel content-panel">
-        <div className="section-header">
-          <p className="eyebrow">Goals</p>
-          <h2>Challenge ladder</h2>
-          <p className="section-text">
-            Four progressively harder objectives, from solo dungeon clears to full deathless mastery.
-          </p>
-        </div>
-        <div className="goal-grid">
-          {goals.map((goal) => (
-            <article className="goal-card" key={goal.tier}>
-              <span className="goal-tier">{goal.tier}</span>
-              <h3>{goal.title}</h3>
-              <p>{goal.description}</p>
-            </article>
+      <section className="panel activity-panel">
+        <h2>Difficulty</h2>
+        <div className="choice-grid">
+          {difficultyOptions.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              className={`choice-card ${difficulty === option.id ? 'selected' : ''}`}
+              onClick={() => setDifficulty(option.id)}
+              aria-pressed={difficulty === option.id}
+            >
+              <span className="choice-label">{option.label}</span>
+              <span className="choice-description">{option.description}</span>
+            </button>
           ))}
         </div>
       </section>
 
-      <section className="panel content-panel">
-        <div className="section-header">
-          <p className="eyebrow">Marks</p>
-          <h2>Mark economy</h2>
+      <section className="panel activity-panel">
+        <h2>Ruleset</h2>
+        <div className="choice-grid">
+          {rulesetOptions.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              className={`choice-card ${ruleset === option.id ? 'selected' : ''}`}
+              onClick={() => setRuleset(option.id)}
+              aria-pressed={ruleset === option.id}
+            >
+              <span className="choice-label">{option.label}</span>
+              <span className="choice-description">{option.description}</span>
+            </button>
+          ))}
         </div>
-        <List items={markRules} />
+      </section>
+
+      <section className="panel activity-panel">
+        <h2>Selected rules</h2>
+        <p className="section-text">
+          Difficulty: <strong>{difficulty}</strong> · Ruleset: <strong>{ruleset}</strong>
+        </p>
+        <div className="rules-list">
+          {activeRules.map((rule, index) => (
+            <article className="rule-row" key={index}>
+              <span className="rule-index">{index + 1}</span>
+              <p>{rule}</p>
+            </article>
+          ))}
+        </div>
       </section>
     </Layout>
   )

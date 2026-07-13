@@ -1,35 +1,55 @@
 import Layout from '../components/Layout'
-import { unlocks } from '../data'
+import { unlockGroups } from '../data'
 
-function UnlockGroup({ title, items }) {
+function UnlockGroup({ title, groupKey, items, unlocks, setUnlocks }) {
+  const toggle = (index) => {
+    const key = `${groupKey}:${index}`
+    setUnlocks((prev) => ({
+      ...prev,
+      [key]: !prev[key]
+    }))
+  }
+
   return (
     <section className="panel activity-panel">
       <h2>{title}</h2>
-      <div className="activity-list">
-        {items.map((item, index) => (
-          <article className="activity-row" key={`${title}-${item.name}-${index}`}>
-            <span>{item.name}</span>
-            <strong>{item.cost} marks</strong>
-          </article>
-        ))}
+      <div className="unlock-list">
+        {items.map((item, index) => {
+          const key = `${groupKey}:${index}`
+          const checked = Boolean(unlocks[key])
+          return (
+            <label className="unlock-row" key={key}>
+              <span className="unlock-copy">
+                <span className="unlock-name">{item.name}</span>
+                <span className="unlock-cost">{checked ? `-${item.cost} marks` : `+${item.cost} marks`}</span>
+              </span>
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={() => toggle(index)}
+                aria-label={`${item.name} ${checked ? 'remove' : 'add'} ${item.cost} marks`}
+              />
+            </label>
+          )
+        })}
       </div>
     </section>
   )
 }
 
-export default function UnlocksPage({ nav }) {
+export default function UnlocksPage({ nav, unlocks, setUnlocks }) {
   return (
     <Layout
       nav={nav}
       eyebrow="Unlocks"
       title="Relics and Subclasses"
-      intro="Unlock slots, costs, and progression paths arranged as a compact control board."
+      intro="Check an unlock to remove its points. Uncheck it to add the points back."
     >
       <section className="unlock-grid">
-        <UnlockGroup title="Relics" items={unlocks.relics} />
-        <UnlockGroup title="Subclasses" items={unlocks.subclasses} />
-        <UnlockGroup title="Aspects" items={unlocks.aspects} />
-        <UnlockGroup title="Fragments" items={unlocks.fragments} />
+        <UnlockGroup title="Relics" groupKey="relics" items={unlockGroups.relics} unlocks={unlocks} setUnlocks={setUnlocks} />
+        <UnlockGroup title="Subclasses" groupKey="subclasses" items={unlockGroups.subclasses} unlocks={unlocks} setUnlocks={setUnlocks} />
+        <UnlockGroup title="Aspects" groupKey="aspects" items={unlockGroups.aspects} unlocks={unlocks} setUnlocks={setUnlocks} />
+        <UnlockGroup title="Fragments" groupKey="fragments" items={unlockGroups.fragments} unlocks={unlocks} setUnlocks={setUnlocks} />
       </section>
     </Layout>
   )
