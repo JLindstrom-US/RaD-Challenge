@@ -12,18 +12,12 @@ function SectionHeader({ eyebrow, title, text }) {
 }
 
 function SimpleList({ items }) {
-  return (
-    <ul className="simple-list">
-      {items.map((item) => (
-        <li key={item}>{item}</li>
-      ))}
-    </ul>
-  )
+  return <ul className="simple-list">{items.map((item) => <li key={item}>{item}</li>)}</ul>
 }
 
 function ActivityList({ title, items }) {
   return (
-    <section className="panel">
+    <section className="panel activity-panel">
       <h3>{title}</h3>
       <div className="activity-list">
         {items.map((item) => (
@@ -39,7 +33,7 @@ function ActivityList({ title, items }) {
 
 function UnlockGroup({ title, items }) {
   return (
-    <section className="panel">
+    <section className="panel activity-panel">
       <h3>{title}</h3>
       <div className="activity-list">
         {items.map((item, index) => (
@@ -56,32 +50,33 @@ function UnlockGroup({ title, items }) {
 export default function App() {
   return (
     <main className="app-shell">
-      <section className="hero panel hero-panel">
-        <p className="eyebrow">Destiny 2 tracker</p>
+      <section className="panel hero-panel">
+        <div className="hero-mark" aria-hidden="true" />
+        <p className="eyebrow">Destiny-inspired tracker</p>
         <h1>RaD Challenge</h1>
         <p className="hero-copy">
-          A simple, responsive tracker built from your workbook for rules, goals, completions,
-          unlocks, and exotic progression.
+          A clean, dark sci-fi interface for your workbook rules, completions, unlocks, and
+          exotic progression — inspired by Destiny’s atmosphere, but designed as an original UI.
         </p>
 
         <div className="hero-meta">
           <div>
-            <span className="meta-label">Style</span>
-            <strong>Simple Destiny UI</strong>
-          </div>
-          <div>
             <span className="meta-label">Mode</span>
-            <strong>Static site, local-first</strong>
+            <strong>Static, responsive</strong>
           </div>
           <div>
-            <span className="meta-label">Next</span>
-            <strong>Interactive progress tracking</strong>
+            <span className="meta-label">Theme</span>
+            <strong>Minimal space ops</strong>
+          </div>
+          <div>
+            <span className="meta-label">Status</span>
+            <strong>Cloudflare live</strong>
           </div>
         </div>
       </section>
 
       <section className="grid-two">
-        <div className="panel">
+        <div className="panel content-panel">
           <SectionHeader
             eyebrow="Rules"
             title="Default rules"
@@ -90,7 +85,7 @@ export default function App() {
           <SimpleList items={rules.default} />
         </div>
 
-        <div className="panel">
+        <div className="panel content-panel">
           <SectionHeader
             eyebrow="Rules"
             title="Expert rules"
@@ -100,7 +95,7 @@ export default function App() {
         </div>
       </section>
 
-      <section className="panel">
+      <section className="panel content-panel">
         <SectionHeader
           eyebrow="Goals"
           title="Challenge ladders"
@@ -117,7 +112,12 @@ export default function App() {
         </div>
       </section>
 
-      <section className="panel">
+      <section className="grid-two">
+        <ActivityList title="Raids" items={raids} />
+        <ActivityList title="Dungeons" items={dungeons} />
+      </section>
+
+      <section className="panel content-panel">
         <SectionHeader
           eyebrow="Marks"
           title="Mark economy"
@@ -126,18 +126,13 @@ export default function App() {
         <SimpleList items={markRules} />
       </section>
 
-      <section className="grid-two">
-        <ActivityList title="Raids" items={raids} />
-        <ActivityList title="Dungeons" items={dungeons} />
-      </section>
-
-      <section className="panel">
+      <section className="panel content-panel">
         <SectionHeader
           eyebrow="Unlocks"
-          title="Relics and subclasses"
-          text="Unlock costs pulled from the workbook."
+          title="Relics, subclasses, and exotics"
+          text="Tiered unlocks, class paths, and wheel spins are shown as a clean tactical control panel rather than a flashy game HUD."
         />
-        <div className="grid-two">
+        <div className="unlock-grid">
           <UnlockGroup title="Relics" items={unlocks.relics} />
           <UnlockGroup title="Subclasses" items={unlocks.subclasses} />
           <UnlockGroup title="Aspects" items={unlocks.aspects} />
@@ -145,7 +140,7 @@ export default function App() {
         </div>
       </section>
 
-      <section className="panel">
+      <section className="panel content-panel">
         <SectionHeader
           eyebrow="Exotics"
           title="Exotic rules"

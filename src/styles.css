@@ -1,51 +1,69 @@
 :root {
-  --bg: #0c0e12;
-  --bg-soft: #12161c;
-  --panel: #171c24;
-  --panel-2: #1d2430;
-  --border: #2a3444;
-  --text: #f4f5f7;
-  --muted: #a5afbd;
-  --accent: #d6b36a;
-  --accent-soft: rgba(214, 179, 106, 0.14);
-  --radius: 16px;
-  --shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
-  --content: 1180px;
+  --bg: #0a0d12;
+  --bg2: #10161f;
+  --panel: #141b25;
+  --panel2: #1a2230;
+  --panel3: rgba(255, 255, 255, 0.02);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(212, 180, 107, 0.18);
+  --text: #f3f6fa;
+  --muted: #9ea9b7;
+  --accent: #d4b46b;
+  --accent-cool: #7f97ad;
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
+  --radius: 18px;
+  --radius-sm: 14px;
+  --max: 1180px;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
+html,
+body {
+  margin: 0;
 }
 
 body {
-  margin: 0;
   min-height: 100vh;
-  font-family: Arial, sans-serif;
-  background:
-    linear-gradient(180deg, rgba(214, 179, 106, 0.06), transparent 180px),
-    linear-gradient(180deg, var(--bg), var(--bg-soft));
+  font-family: Inter, system-ui, sans-serif;
   color: var(--text);
+  background:
+    radial-gradient(circle at top, rgba(212, 180, 107, 0.08), transparent 24%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  letter-spacing: 0.01em;
 }
 
 h1,
 h2,
-h3 {
-  margin: 0;
-  line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-
+h3,
 p {
   margin: 0;
 }
 
+h1 {
+  font-size: clamp(2.3rem, 4vw, 4.4rem);
+  line-height: 0.98;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+h2 {
+  font-size: clamp(1.15rem, 2vw, 1.75rem);
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+h3 {
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .app-shell {
-  width: min(calc(100% - 32px), var(--content));
+  width: min(calc(100% - 32px), var(--max));
   margin: 0 auto;
   padding: 24px 0 56px;
   display: grid;
@@ -53,24 +71,63 @@ p {
 }
 
 .panel {
-  background: linear-gradient(180deg, var(--panel), var(--panel-2));
-  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--panel), var(--panel2));
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 24px;
   box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.02), transparent),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 40%);
+  pointer-events: none;
 }
 
 .hero-panel {
-  padding: 32px 24px;
+  padding: 36px 24px;
+}
+
+.hero-mark {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: 96px;
+  height: 96px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  opacity: 0.5;
+  background:
+    radial-gradient(circle, rgba(212, 180, 107, 0.12), transparent 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
+  box-shadow: inset 0 0 24px rgba(212, 180, 107, 0.08);
+}
+
+.hero-mark::before,
+.hero-mark::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+}
+
+.hero-mark::after {
+  inset: 34px;
 }
 
 .eyebrow {
-  margin-bottom: 10px;
+  margin: 0 0 10px;
   color: var(--accent);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
+  font-weight: 700;
 }
 
 .hero-copy,
@@ -83,9 +140,9 @@ p {
 }
 
 .hero-copy {
-  margin-top: 14px;
-  max-width: 60ch;
-  line-height: 1.7;
+  margin-top: 16px;
+  max-width: 62ch;
+  line-height: 1.75;
 }
 
 .hero-meta {
@@ -95,19 +152,30 @@ p {
   margin-top: 24px;
 }
 
-.hero-meta div {
+.hero-meta > div,
+.goal-card,
+.activity-row {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel3);
+}
+
+.hero-meta > div {
   padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(4px);
 }
 
 .meta-label {
   display: block;
   font-size: 12px;
-  text-transform: uppercase;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
   margin-bottom: 6px;
+}
+
+.content-panel,
+.activity-panel {
+  padding: 24px;
 }
 
 .section-header {
@@ -117,6 +185,7 @@ p {
 .section-text {
   margin-top: 10px;
   line-height: 1.6;
+  max-width: 62ch;
 }
 
 .grid-two {
@@ -130,7 +199,7 @@ p {
   padding-left: 18px;
   display: grid;
   gap: 12px;
-  line-height: 1.65;
+  line-height: 1.7;
 }
 
 .goal-grid {
@@ -140,10 +209,8 @@ p {
 }
 
 .goal-card {
-  border: 1px solid var(--border);
-  border-radius: 14px;
   padding: 18px;
-  background: rgba(255, 255, 255, 0.02);
+  border-color: var(--line-strong);
 }
 
 .goal-tier {
@@ -151,21 +218,21 @@ p {
   margin-bottom: 12px;
   padding: 6px 10px;
   border-radius: 999px;
-  background: var(--accent-soft);
+  background: rgba(212, 180, 107, 0.12);
   color: var(--accent);
   font-size: 12px;
-  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.goal-card h3 {
-  margin-bottom: 10px;
-  font-size: 1.05rem;
+  font-weight: 700;
 }
 
 .goal-card p {
+  margin-top: 8px;
   line-height: 1.6;
+}
+
+.activity-panel h3 {
+  margin-bottom: 14px;
 }
 
 .activity-list {
@@ -179,15 +246,23 @@ p {
   gap: 16px;
   align-items: center;
   padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
 }
 
 .activity-row strong {
   color: var(--accent);
-  font-size: 0.95rem;
   white-space: nowrap;
+  font-weight: 700;
+}
+
+.unlock-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.panel:hover {
+  border-color: rgba(212, 180, 107, 0.16);
+  transition: border-color 180ms ease;
 }
 
 @media (min-width: 760px) {
@@ -196,6 +271,10 @@ p {
   }
 
   .goal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .unlock-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -208,5 +287,10 @@ p {
   .activity-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .hero-mark {
+    width: 72px;
+    height: 72px;
   }
 }
