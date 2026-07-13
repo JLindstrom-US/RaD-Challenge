@@ -1,46 +1,4 @@
-export const rules = {
-  default: [
-    'Must be a "Fresh" Character — no vault allowed. Start with white rarity gear from Collections.',
-    'You can only use raid and dungeon drops. No world drops.',
-    'No checkpoints. Full clears only.',
-    'You may use any exotic armor or weapons from Collections.'
-  ],
-  expert: [
-    'Must be a "Fresh" Character — no vault allowed. Start with white rarity gear from Collections.',
-    'You can only use raid and dungeon drops. No world drops.',
-    'No checkpoints. Full clears only.',
-    'First subclass is free. No aspect or fragment slots until redeemed. Cannot use Prismatic until redeemed.',
-    'No relic perks allowed until redeemed.',
-    'Exotic access unlocks once all gear slots are Tier 5.'
-  ]
-}
-
-export const goals = [
-  {
-    tier: 'Easy',
-    title: 'Complete each dungeon solo without dying',
-    description:
-      'Complete every dungeon solo without dying on any difficulty. Deathless completions do not have to be back-to-back.'
-  },
-  {
-    tier: 'Medium',
-    title: 'Complete each raid and dungeon without dying',
-    description:
-      'Complete every dungeon and raid without dying on any difficulty. Deathless completions do not have to be back-to-back.'
-  },
-  {
-    tier: 'Hard',
-    title: 'Complete all Pantheons without dying',
-    description:
-      'Complete all 3 Pantheons without dying on default difficulty. Deathless completions must be completed back-to-back.'
-  },
-  {
-    tier: 'Impossible',
-    title: 'Complete all dungeons solo without dying',
-    description:
-      'Complete all dungeons solo without dying on any difficulty. Deathless completions must be completed back-to-back.'
-  }
-]
+export const STORAGE_KEY = 'rad-progress-v1'
 
 export const raids = [
   { name: 'Last Wish', marks: 2 },
@@ -83,6 +41,32 @@ export const dungeons = [
   { name: 'Sundered Doctrine - Master', marks: 2 },
   { name: 'Equilibrium - Normal', marks: 1 },
   { name: 'Equilibrium - Master', marks: 2 }
+]
+
+export const allActivities = [...raids, ...dungeons]
+
+export const rules = {
+  default: [
+    'Must be a "Fresh" Character — no vault allowed. Start with white rarity gear from Collections.',
+    'You can only use raid and dungeon drops. No world drops.',
+    'No checkpoints. Full clears only.',
+    'You may use any exotic armor or weapons from Collections.'
+  ],
+  expert: [
+    'Must be a "Fresh" Character — no vault allowed. Start with white rarity gear from Collections.',
+    'You can only use raid and dungeon drops. No world drops.',
+    'No checkpoints. Full clears only.',
+    'First subclass is free. No aspect or fragment slots until redeemed. Cannot use Prismatic until redeemed.',
+    'No relic perks allowed until redeemed.',
+    'Exotic access unlocks once all gear slots are Tier 5.'
+  ]
+}
+
+export const goals = [
+  { tier: 'Easy', title: 'Complete each dungeon solo without dying', description: 'Complete every dungeon solo without dying on any difficulty. Deathless completions do not have to be back-to-back.' },
+  { tier: 'Medium', title: 'Complete each raid and dungeon without dying', description: 'Complete every dungeon and raid without dying on any difficulty. Deathless completions do not have to be back-to-back.' },
+  { tier: 'Hard', title: 'Complete all Pantheons without dying', description: 'Complete all 3 Pantheons without dying on default difficulty. Deathless completions must be completed back-to-back.' },
+  { tier: 'Impossible', title: 'Complete all dungeons solo without dying', description: 'Complete all dungeons solo without dying on any difficulty. Deathless completions must be completed back-to-back.' }
 ]
 
 export const unlocks = {
