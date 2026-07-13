@@ -69,7 +69,7 @@ export const goals = [
   { tier: 'Impossible', title: 'Complete all dungeons solo without dying', description: 'Complete all dungeons solo without dying on any difficulty. Deathless completions must be completed back-to-back.' }
 ]
 
-export const unlocks = {
+export const unlockGroups = {
   relics: [
     { name: 'Tier 1', cost: 3 },
     { name: 'Tier 1', cost: 3 },
