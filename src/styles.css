@@ -835,3 +835,67 @@ h3 {
   }
 }
 
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(14px);
+  background: rgba(10, 14, 20, 0.88);
+}
+
+.choice-note {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.unlock-list {
+  display: grid;
+  gap: 10px;
+}
+
+.unlock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel3);
+}
+
+.unlock-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.unlock-name {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.unlock-cost {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.unlock-row input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+}
+
+.debug-actions {
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 760px) {
+  .debug-actions {
+    grid-template-columns: minmax(220px, 1fr) auto auto auto;
+    align-items: end;
+  }
+}

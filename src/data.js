@@ -116,20 +116,3 @@ export const unlockGroups = {
     { name: 'Fragment 6', cost: 3 }
   ]
 }
-
-export const markRules = [
-  'Each raid and dungeon completion awards marks.',
-  'Marks can be exchanged for relic unlocks, subclass unlocks, and exotic wheel spins.',
-  'The first completion of every raid or dungeon awards full points.',
-  'Repeated completions are worth half points.',
-  'Deathless tracking is for convenience and does not change mark totals in the workbook.'
-]
-
-export const exoticRules = [
-  'Exotic armor wheel spins cost 5 marks.',
-  'Exotic weapon wheel spins cost 5 marks.',
-  'Exotic access requires all gear slots at Tier 5.',
-  'You may re-roll or skip the exotic if you do not have it.',
-  'Dismantling an exotic grants 1 mark if you want to use that rule.',
-  'Dual Destiny costs 5 marks for 1 completion toward an exotic class item.'
-]

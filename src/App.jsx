@@ -20,15 +20,25 @@ function calcActivityMarks(completions) {
   }, 0)
 }
 
-function calcUnlockMarks(unlocks) {
+function calcBaseUnlockMarks(unlocks) {
   return Object.entries(unlocks || {}).reduce((sum, [key, checked]) => {
     if (!checked) return sum
-    const [group, ...rest] = key.split(':')
-    const index = Number(rest.join(':'))
-    if (group !== 'subclasses') return sum
-    const item = unlockGroups.subclasses[index]
-    return item ? sum - (item.name === 'Prismatic' ? 10 : item.cost) : sum
+    const [group, indexString] = key.split(':')
+    if (group === 'subclasses') return sum
+    const index = Number(indexString)
+    const item = unlockGroups[group]?.[index]
+    return item ? sum - item.cost : sum
   }, 0)
+}
+
+function calcSubclassMarks(subclassUnlocks, freeSubclassUsed) {
+  const freeEligible = ['Solar', 'Arc', 'Void', 'Stasis', 'Strand']
+  return Object.entries(subclassUnlocks || {}).reduce((sum, [name, unlocked]) => {
+    if (!unlocked) return sum
+    if (name === 'Prismatic') return sum - 10
+    if (freeEligible.includes(name)) return sum - 5
+    return sum
+  }, 0) + (freeSubclassUsed ? 5 : 0)
 }
 
 function calcExoticMarks(exotics) {
@@ -36,6 +46,7 @@ function calcExoticMarks(exotics) {
   const armorCount = Number(exotics?.armorCount || 0)
   const dismantledCount = Number(exotics?.dismantledCount || 0)
   const dualDestinyCount = Number(exotics?.dualDestinyCount || 0)
+
   return -(weaponCount * 5) - (armorCount * 5) + dismantledCount - (dualDestinyCount * 5)
 }
 
@@ -43,10 +54,15 @@ export default function App() {
   const [progress, setProgress] = useLocalState(STORAGE_KEY, {
     completions: {},
     unlocks: {},
-    subclass: {
-      selected: '',
-      freeUsed: false
+    subclassUnlocks: {
+      Solar: false,
+      Arc: false,
+      Void: false,
+      Stasis: false,
+      Strand: false,
+      Prismatic: false
     },
+    freeSubclassUsed: false,
     exotics: {
       weaponCount: 0,
       armorCount: 0,
@@ -55,53 +71,81 @@ export default function App() {
       weaponWheelUrl: 'https://example.com/exotic-weapon-wheel',
       armorWheelUrl: 'https://example.com/exotic-armor-wheel'
     },
-    manualAdjust: 0
+    pointOverrideEnabled: false,
+    pointOverrideValue: 0
   })
 
   const completions = progress.completions || {}
   const unlocks = progress.unlocks || {}
-  const subclass = progress.subclass || { selected: '', freeUsed: false }
+  const subclassUnlocks = progress.subclassUnlocks || {
+    Solar: false,
+    Arc: false,
+    Void: false,
+    Stasis: false,
+    Strand: false,
+    Prismatic: false
+  }
+  const freeSubclassUsed = Boolean(progress.freeSubclassUsed)
   const exotics = progress.exotics || {}
-  const manualAdjust = Number(progress.manualAdjust || 0)
+  const pointOverrideEnabled = Boolean(progress.pointOverrideEnabled)
+  const pointOverrideValue = Number(progress.pointOverrideValue || 0)
 
   const activityMarks = calcActivityMarks(completions)
-  const unlockMarks = calcUnlockMarks(unlocks)
+  const baseUnlockMarks = calcBaseUnlockMarks(unlocks)
+  const subclassMarks = calcSubclassMarks(subclassUnlocks, freeSubclassUsed)
   const exoticMarks = calcExoticMarks(exotics)
-  const availableMarks = activityMarks + unlockMarks + exoticMarks + manualAdjust
+  const computedMarks = activityMarks + baseUnlockMarks + subclassMarks + exoticMarks
+  const availableMarks = pointOverrideEnabled ? pointOverrideValue : computedMarks
 
   const setCompletions = (updater) => {
     setProgress((prev) => {
-      const nextCompletions = typeof updater === 'function' ? updater(prev.completions || {}) : updater
-      return { ...prev, completions: nextCompletions }
+      const next = typeof updater === 'function' ? updater(prev.completions || {}) : updater
+      return { ...prev, completions: next }
     })
   }
 
   const setUnlocks = (updater) => {
     setProgress((prev) => {
-      const nextUnlocks = typeof updater === 'function' ? updater(prev.unlocks || {}) : updater
-      return { ...prev, unlocks: nextUnlocks }
+      const next = typeof updater === 'function' ? updater(prev.unlocks || {}) : updater
+      return { ...prev, unlocks: next }
     })
   }
 
-  const setSubclass = (updater) => {
+  const setSubclassState = (updater) => {
     setProgress((prev) => {
-      const nextSubclass = typeof updater === 'function' ? updater(prev.subclass || { selected: '', freeUsed: false }) : updater
-      return { ...prev, subclass: nextSubclass }
+      const current = {
+        subclassUnlocks: prev.subclassUnlocks || {
+          Solar: false,
+          Arc: false,
+          Void: false,
+          Stasis: false,
+          Strand: false,
+          Prismatic: false
+        },
+        freeSubclassUsed: Boolean(prev.freeSubclassUsed)
+      }
+      const next = typeof updater === 'function' ? updater(current) : updater
+      return {
+        ...prev,
+        subclassUnlocks: next.subclassUnlocks,
+        freeSubclassUsed: next.freeSubclassUsed
+      }
     })
   }
 
   const setExotics = (updater) => {
     setProgress((prev) => {
-      const nextExotics = typeof updater === 'function' ? updater(prev.exotics || {}) : updater
-      return { ...prev, exotics: nextExotics }
+      const next = typeof updater === 'function' ? updater(prev.exotics || {}) : updater
+      return { ...prev, exotics: next }
     })
   }
 
-  const setManualAdjust = (updater) => {
-    setProgress((prev) => {
-      const nextAdjust = typeof updater === 'function' ? updater(Number(prev.manualAdjust || 0)) : updater
-      return { ...prev, manualAdjust: Number(nextAdjust || 0) }
-    })
+  const setPointOverride = ({ enabled, value }) => {
+    setProgress((prev) => ({
+      ...prev,
+      pointOverrideEnabled: enabled,
+      pointOverrideValue: Number(value || 0)
+    }))
   }
 
   return (
@@ -125,9 +169,9 @@ export default function App() {
             nav={<TopNav availableMarks={availableMarks} />}
             unlocks={unlocks}
             setUnlocks={setUnlocks}
-            subclass={subclass}
-            setSubclass={setSubclass}
-            availableMarks={availableMarks}
+            subclassUnlocks={subclassUnlocks}
+            freeSubclassUsed={freeSubclassUsed}
+            setSubclassState={setSubclassState}
           />
         }
       />
@@ -146,8 +190,9 @@ export default function App() {
         element={
           <DebugPage
             nav={<TopNav availableMarks={availableMarks} />}
-            manualAdjust={manualAdjust}
-            setManualAdjust={setManualAdjust}
+            pointOverrideEnabled={pointOverrideEnabled}
+            pointOverrideValue={pointOverrideValue}
+            setPointOverride={setPointOverride}
             setProgress={setProgress}
           />
         }

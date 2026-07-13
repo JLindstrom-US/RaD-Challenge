@@ -4,7 +4,10 @@ import { unlockGroups } from '../data'
 function UnlockGroup({ title, groupKey, items, unlocks, setUnlocks }) {
   const toggle = (index) => {
     const key = `${groupKey}:${index}`
-    setUnlocks((prev) => ({ ...prev, [key]: !prev[key] }))
+    setUnlocks((prev) => ({
+      ...prev,
+      [key]: !prev[key]
+    }))
   }
 
   return (
@@ -14,19 +17,18 @@ function UnlockGroup({ title, groupKey, items, unlocks, setUnlocks }) {
         {items.map((item, index) => {
           const key = `${groupKey}:${index}`
           const checked = Boolean(unlocks[key])
-          const isFree = item.free && item.name !== 'Prismatic'
-          const costText = isFree ? 'Free' : `${item.name === 'Prismatic' ? 10 : item.cost} Marks`
+
           return (
             <label className="unlock-row" key={key}>
               <span className="unlock-copy">
                 <span className="unlock-name">{item.name}</span>
-                <span className="unlock-cost">{costText}</span>
+                <span className="unlock-cost">{item.cost} Marks</span>
               </span>
               <input
                 type="checkbox"
                 checked={checked}
                 onChange={() => toggle(index)}
-                aria-label={`${item.name} ${checked ? 'remove' : 'add'} marks`}
+                aria-label={`${item.name} unlock`}
               />
             </label>
           )
@@ -36,64 +38,66 @@ function UnlockGroup({ title, groupKey, items, unlocks, setUnlocks }) {
   )
 }
 
-function SubclassGroup({ subclass, setSubclass, availableMarks }) {
-  const options = unlockGroups.subclasses
+function SubclassGroup({ subclassUnlocks, freeSubclassUsed, setSubclassState }) {
+  const freeEligible = ['Solar', 'Arc', 'Void', 'Stasis', 'Strand']
 
-  const selectSubclass = (name) => {
-    const isPrismatic = name === 'Prismatic'
-    const freeEligible = ['Solar', 'Arc', 'Void', 'Stasis', 'Strand'].includes(name)
+  const toggleSubclass = (name) => {
+    const isUnlocked = Boolean(subclassUnlocks[name])
 
-    setSubclass((prev) => {
-      const selected = prev?.selected || ''
-      const freeUsed = Boolean(prev?.freeUsed)
+    if (isUnlocked) {
+      setSubclassState((prev) => ({
+        subclassUnlocks: {
+          ...prev.subclassUnlocks,
+          [name]: false
+        },
+        freeSubclassUsed: prev.freeSubclassUsed
+      }))
+      return
+    }
 
-      if (isPrismatic) {
-        return { selected: name, freeUsed }
+    setSubclassState((prev) => {
+      const isFreeEligible = freeEligible.includes(name)
+      const shouldConsumeFree = isFreeEligible && !prev.freeSubclassUsed
+
+      return {
+        subclassUnlocks: {
+          ...prev.subclassUnlocks,
+          [name]: true
+        },
+        freeSubclassUsed: prev.freeSubclassUsed || shouldConsumeFree
       }
-
-      if (!freeUsed) {
-        return { selected: name, freeUsed: true }
-      }
-
-      return { selected: name, freeUsed: true }
     })
   }
 
-  const currentCost = (name) => {
-    if (name === 'Prismatic') return 10
-    if (subclass.selected === name && !subclass.freeUsed && ['Solar', 'Arc', 'Void', 'Stasis', 'Strand'].includes(name)) return 0
-    if (['Solar', 'Arc', 'Void', 'Stasis', 'Strand'].includes(name)) return 5
-    return 5
+  const getCostLabel = (name) => {
+    if (name === 'Prismatic') return '10 Marks'
+    if (!freeSubclassUsed) return 'Free first unlock, then 5 Marks'
+    return '5 Marks'
   }
 
   return (
     <section className="panel activity-panel">
-      <h2>Subclass</h2>
-      <div className="choice-grid">
-        {options.map((item) => {
-          const selected = subclass.selected === item.name
-          const cost = currentCost(item.name)
-          const freeEligible = ['Solar', 'Arc', 'Void', 'Stasis', 'Strand'].includes(item.name)
-          const label = item.name === 'Prismatic' ? '10 Marks' : freeEligible && !subclass.freeUsed && !selected ? 'Free' : `${cost} Marks`
+      <h2>Subclasses</h2>
+      <p className="section-text">
+        Unlock all 6 if you want. Your first Solar, Arc, Void, Stasis, or Strand unlock is free. Every later one costs 5 Marks. Prismatic always costs 10 Marks.
+      </p>
+      <div className="unlock-list">
+        {unlockGroups.subclasses.map((item) => {
+          const checked = Boolean(subclassUnlocks[item.name])
 
           return (
-            <button
-              key={item.name}
-              type="button"
-              className={`choice-card ${selected ? 'selected' : ''}`}
-              onClick={() => selectSubclass(item.name)}
-              aria-pressed={selected}
-            >
-              <span className="choice-label">{item.name}</span>
-              <span className="choice-description">
-                {item.name === 'Prismatic'
-                  ? 'Always costs 10 marks.'
-                  : freeEligible
-                    ? 'First pick is free, later picks cost 5 marks.'
-                    : 'Costs 5 marks.'}
+            <label className="unlock-row" key={item.name}>
+              <span className="unlock-copy">
+                <span className="unlock-name">{item.name}</span>
+                <span className="unlock-cost">{getCostLabel(item.name)}</span>
               </span>
-              <span className="choice-note">{label}</span>
-            </button>
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={() => toggleSubclass(item.name)}
+                aria-label={`${item.name} subclass unlock`}
+              />
+            </label>
           )
         })}
       </div>
@@ -101,19 +105,48 @@ function SubclassGroup({ subclass, setSubclass, availableMarks }) {
   )
 }
 
-export default function UnlocksPage({ nav, unlocks, setUnlocks, subclass, setSubclass, availableMarks }) {
+export default function UnlocksPage({
+  nav,
+  unlocks,
+  setUnlocks,
+  subclassUnlocks,
+  freeSubclassUsed,
+  setSubclassState
+}) {
   return (
     <Layout
       nav={nav}
       eyebrow="Unlocks"
       title="Relics and Subclasses"
-      intro="Check an unlock to remove its points. Pick one subclass, with the first Solar/Arc/Void/Stasis/Strand choice free."
+      intro="Check an unlock to remove its points. Subclasses can all be unlocked, but only the first non-Prismatic subclass is free."
     >
       <section className="unlock-grid">
-        <UnlockGroup title="Relics" groupKey="relics" items={unlockGroups.relics} unlocks={unlocks} setUnlocks={setUnlocks} />
-        <SubclassGroup subclass={subclass} setSubclass={setSubclass} availableMarks={availableMarks} />
-        <UnlockGroup title="Aspects" groupKey="aspects" items={unlockGroups.aspects} unlocks={unlocks} setUnlocks={setUnlocks} />
-        <UnlockGroup title="Fragments" groupKey="fragments" items={unlockGroups.fragments} unlocks={unlocks} setUnlocks={setUnlocks} />
+        <UnlockGroup
+          title="Relics"
+          groupKey="relics"
+          items={unlockGroups.relics}
+          unlocks={unlocks}
+          setUnlocks={setUnlocks}
+        />
+        <SubclassGroup
+          subclassUnlocks={subclassUnlocks}
+          freeSubclassUsed={freeSubclassUsed}
+          setSubclassState={setSubclassState}
+        />
+        <UnlockGroup
+          title="Aspects"
+          groupKey="aspects"
+          items={unlockGroups.aspects}
+          unlocks={unlocks}
+          setUnlocks={setUnlocks}
+        />
+        <UnlockGroup
+          title="Fragments"
+          groupKey="fragments"
+          items={unlockGroups.fragments}
+          unlocks={unlocks}
+          setUnlocks={setUnlocks}
+        />
       </section>
     </Layout>
   )
