@@ -36,12 +36,8 @@ export default function ExoticsPage({ nav, exotics, setExotics }) {
   const armorCount = Number(exotics.armorCount || 0)
   const dismantledCount = Number(exotics.dismantledCount || 0)
   const dualDestinyCount = Number(exotics.dualDestinyCount || 0)
-  const weaponCost = Number(exotics.weaponCost || 0)
-  const armorCost = Number(exotics.armorCost || 0)
 
-  const update = (patch) => {
-    setExotics((prev) => ({ ...prev, ...patch }))
-  }
+  const update = (patch) => setExotics((prev) => ({ ...prev, ...patch }))
 
   return (
     <Layout
@@ -72,14 +68,14 @@ export default function ExoticsPage({ nav, exotics, setExotics }) {
           <CounterRow
             label="Exotic Weapons"
             value={weaponCount}
-            note={`Each costs ${weaponCost} marks`}
+            note="5 Marks each"
             onAdd={() => update({ weaponCount: weaponCount + 1 })}
             onRemove={() => update({ weaponCount: Math.max(0, weaponCount - 1) })}
           />
           <CounterRow
             label="Exotic Armor"
             value={armorCount}
-            note={`Each costs ${armorCost} marks`}
+            note="5 Marks each"
             onAdd={() => update({ armorCount: armorCount + 1 })}
             onRemove={() => update({ armorCount: Math.max(0, armorCount - 1) })}
           />

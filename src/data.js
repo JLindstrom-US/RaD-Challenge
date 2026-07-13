@@ -63,10 +63,26 @@ export const rules = {
 }
 
 export const goals = [
-  { tier: 'Easy', title: 'Complete each dungeon solo without dying', description: 'Complete every dungeon solo without dying on any difficulty. Deathless completions do not have to be back-to-back.' },
-  { tier: 'Medium', title: 'Complete each raid and dungeon without dying', description: 'Complete every dungeon and raid without dying on any difficulty. Deathless completions do not have to be back-to-back.' },
-  { tier: 'Hard', title: 'Complete all Pantheons without dying', description: 'Complete all 3 Pantheons without dying on default difficulty. Deathless completions must be completed back-to-back.' },
-  { tier: 'Impossible', title: 'Complete all dungeons solo without dying', description: 'Complete all dungeons solo without dying on any difficulty. Deathless completions must be completed back-to-back.' }
+  {
+    tier: 'Easy',
+    title: 'Complete each dungeon solo without dying',
+    description: 'Complete every dungeon solo without dying on any difficulty. Deathless completions do not have to be back-to-back.'
+  },
+  {
+    tier: 'Medium',
+    title: 'Complete each raid and dungeon without dying',
+    description: 'Complete every dungeon and raid without dying on any difficulty. Deathless completions do not have to be back-to-back.'
+  },
+  {
+    tier: 'Hard',
+    title: 'Complete all Pantheons without dying',
+    description: 'Complete all 3 Pantheons without dying on default difficulty. Deathless completions must be completed back-to-back.'
+  },
+  {
+    tier: 'Impossible',
+    title: 'Complete all dungeons solo without dying',
+    description: 'Complete all dungeons solo without dying on any difficulty. Deathless completions must be completed back-to-back.'
+  }
 ]
 
 export const unlockGroups = {
@@ -80,12 +96,12 @@ export const unlockGroups = {
     { name: 'Tier 3', cost: 10 }
   ],
   subclasses: [
-    { name: 'Solar', cost: 5 },
-    { name: 'Arc', cost: 5 },
-    { name: 'Void', cost: 5 },
-    { name: 'Stasis', cost: 5 },
-    { name: 'Strand', cost: 5 },
-    { name: 'Prismatic', cost: 10 }
+    { name: 'Solar' },
+    { name: 'Arc' },
+    { name: 'Void' },
+    { name: 'Stasis' },
+    { name: 'Strand' },
+    { name: 'Prismatic' }
   ],
   aspects: [
     { name: 'Aspect 1', cost: 5 },

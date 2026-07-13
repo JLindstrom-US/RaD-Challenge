@@ -810,3 +810,28 @@ h3 {
   font-size: 12px;
   font-weight: 700;
 }
+
+.choice-note {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.unlock-cost {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.debug-actions {
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 760px) {
+  .debug-actions {
+    grid-template-columns: 1fr auto auto;
+    align-items: end;
+  }
+}
+

@@ -25,9 +25,9 @@ function calcUnlockMarks(unlocks) {
     if (!checked) return sum
     const [group, ...rest] = key.split(':')
     const index = Number(rest.join(':'))
-    const items = unlockGroups[group] || []
-    const item = items[index]
-    return item ? sum - item.cost : sum
+    if (group !== 'subclasses') return sum
+    const item = unlockGroups.subclasses[index]
+    return item ? sum - (item.name === 'Prismatic' ? 10 : item.cost) : sum
   }, 0)
 }
 
@@ -36,29 +36,22 @@ function calcExoticMarks(exotics) {
   const armorCount = Number(exotics?.armorCount || 0)
   const dismantledCount = Number(exotics?.dismantledCount || 0)
   const dualDestinyCount = Number(exotics?.dualDestinyCount || 0)
-  const weaponCost = Number(exotics?.weaponCost || 0)
-  const armorCost = Number(exotics?.armorCost || 0)
-  const dualDestinyCost = 5
-
-  return (
-    -(weaponCount * weaponCost) -
-    (armorCount * armorCost) +
-    dismantledCount +
-    -(dualDestinyCount * dualDestinyCost)
-  )
+  return -(weaponCount * 5) - (armorCount * 5) + dismantledCount - (dualDestinyCount * 5)
 }
 
 export default function App() {
   const [progress, setProgress] = useLocalState(STORAGE_KEY, {
     completions: {},
     unlocks: {},
+    subclass: {
+      selected: '',
+      freeUsed: false
+    },
     exotics: {
       weaponCount: 0,
       armorCount: 0,
       dismantledCount: 0,
       dualDestinyCount: 0,
-      weaponCost: 0,
-      armorCost: 0,
       weaponWheelUrl: 'https://example.com/exotic-weapon-wheel',
       armorWheelUrl: 'https://example.com/exotic-armor-wheel'
     },
@@ -67,6 +60,7 @@ export default function App() {
 
   const completions = progress.completions || {}
   const unlocks = progress.unlocks || {}
+  const subclass = progress.subclass || { selected: '', freeUsed: false }
   const exotics = progress.exotics || {}
   const manualAdjust = Number(progress.manualAdjust || 0)
 
@@ -86,6 +80,13 @@ export default function App() {
     setProgress((prev) => {
       const nextUnlocks = typeof updater === 'function' ? updater(prev.unlocks || {}) : updater
       return { ...prev, unlocks: nextUnlocks }
+    })
+  }
+
+  const setSubclass = (updater) => {
+    setProgress((prev) => {
+      const nextSubclass = typeof updater === 'function' ? updater(prev.subclass || { selected: '', freeUsed: false }) : updater
+      return { ...prev, subclass: nextSubclass }
     })
   }
 
@@ -124,6 +125,9 @@ export default function App() {
             nav={<TopNav availableMarks={availableMarks} />}
             unlocks={unlocks}
             setUnlocks={setUnlocks}
+            subclass={subclass}
+            setSubclass={setSubclass}
+            availableMarks={availableMarks}
           />
         }
       />
