@@ -219,6 +219,9 @@ export default function App() {
             pointOverrideValue={pointOverrideValue}
             setPointOverride={setPointOverride}
             setProgress={setProgress}
+            completions={completions}
+            setCompletions={setCompletions}
+            activities={allActivities}
           />
         }
       />

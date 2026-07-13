@@ -63,7 +63,7 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
             <select value={selected} onChange={(e) => setSelected(e.target.value)}>
               {allActivities.map((activity) => (
                 <option key={activity.name} value={activity.name}>
-                  {activity.name} ({activity.marks} marks)
+                  {activity.name} ({activity.marks} Marks)
                 </option>
               ))}
             </select>

@@ -82,7 +82,7 @@ function SubclassGroup({ subclassUnlocks, freeSubclassName, setSubclassState }) 
 
     if (name === 'Prismatic') return '10 Marks'
     if (checked && freeSubclassName === name) return 'Free'
-    if (!checked && checkedCount === 0 && freeEligible.includes(name)) return 'Free First Unlock'
+    if (!checked && checkedCount === 0 && freeEligible.includes(name)) return 'Free'
     return '5 Marks'
   }
 

@@ -32,7 +32,10 @@ export default function DebugPage({
   pointOverrideEnabled,
   pointOverrideValue,
   setPointOverride,
-  setProgress
+  setProgress,
+  completions,
+  setCompletions,
+  activities
 }) {
   const [value, setValue] = useState(String(pointOverrideValue))
 
@@ -55,6 +58,24 @@ export default function DebugPage({
     localStorage.removeItem('rad-progress-v1')
     setProgress(resetState)
     setValue('0')
+  }
+
+  const adjustCompletion = (name, delta) => {
+  setCompletions((prev) => {
+    const current = Number(prev?.[name] || 0)
+    const next = Math.max(0, current + delta)
+
+    if (next === 0) {
+      const updated = { ...(prev || {}) }
+      delete updated[name]
+      return updated
+    }
+
+    return {
+      ...(prev || {}),
+      [name]: next
+    }
+  })
   }
 
   return (
@@ -92,4 +113,56 @@ export default function DebugPage({
       </section>
     </Layout>
   )
+
+  <section className="panel activity-panel">
+  <h2>Adjust Activity Completions</h2>
+  <p className="section-text">
+    Adjust The Completion Counts Below.
+  </p>
+
+  <div className="debug-counter-list">
+    {[...activities]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((activity) => {
+        const count = Number(completions?.[activity.name] || 0)
+
+        return (
+          <div className="debug-counter-row" key={activity.name}>
+            <div className="debug-counter-copy">
+              <span className="debug-counter-name">{activity.name}</span>
+              <span className="debug-counter-meta">{activity.marks} Marks</span>
+            </div>
+
+            <div className="debug-stepper">
+              <button
+                type="button"
+                className="stepper-button"
+                onClick={() => adjustCompletion(activity.name, -1)}
+                aria-label={`Decrease completions for ${activity.name}`}
+              >
+                -
+              </button>
+
+              <input
+                className="stepper-value"
+                type="number"
+                value={count}
+                readOnly
+                aria-label={`Completions for ${activity.name}`}
+              />
+
+              <button
+                type="button"
+                className="stepper-button"
+                onClick={() => adjustCompletion(activity.name, 1)}
+                aria-label={`Increase completions for ${activity.name}`}
+              >
+                +
+              </button>
+            </div>
+          </div>
+        )
+      })}
+  </div>
+</section>
 }

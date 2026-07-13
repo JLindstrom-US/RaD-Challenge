@@ -4,8 +4,8 @@ import { rules, goals } from '../data'
 import { faqs } from '../data/faqs'
 
 const rulesetOptions = [
-  { id: 'default', label: 'Default Ruleset', description: 'Basic Fresh-Character Rules.' },
-  { id: 'expert', label: 'Expert Ruleset', description: 'Adds Subclass, Relic, and Exotic Restrictions.' }
+  { id: 'Default', label: 'Default Ruleset', description: 'Basic Fresh-Character Rules.' },
+  { id: 'Expert', label: 'Expert Ruleset', description: 'Adds Subclass, Relic, and Exotic Restrictions.' }
 ]
 
 export default function RulesPage({

@@ -1,17 +1,27 @@
 export const faqs = [
   {
-    question: 'What happens when I unlock my first subclass?',
+    question: 'What Is The Point Of The Goals?',
     answer:
-      'If no subclasses are currently unlocked, the first Solar, Arc, Void, Stasis, or Strand unlock is free. Prismatic is never free.'
+      'Simple, to give you something to chase. Some players prefer easier challenges, while others want something impossible'
   },
   {
-    question: 'Can I unlock all subclasses?',
+    question: 'How Do I Unlock My First Subclass?',
     answer:
-      'Yes. All six subclasses can be unlocked. After the free subclass is used, Solar, Arc, Void, Stasis, and Strand each cost 5 Marks, and Prismatic costs 10 Marks.'
+      'The first Solar, Arc, Void, Stasis, or Strand Subclass unlock is free.'
   },
   {
-    question: 'Do my selections save when I close the site?',
+    question: 'Does The Free Subclass Come With Fragments/Aspects?',
     answer:
-      'Yes. Your selected goal, ruleset, unlocks, completions, and other tracker state are saved locally in your browser.'
-  }
+      'No. When unlocking fragments and aspects, you are unlocking access to that SLOT. You can select any Aspect/Fragment as long as you have unlocked the slot for it.'
+  },
+  {
+    question: 'Does My Data Save When I Close The Site?',
+    answer:
+      'Yes, your selected goal, ruleset, unlocks, completions, and other tracker states are saved locally in your browser.'
+  },
+  {
+    question: 'What If I Accidentally Add a Completion?',
+    answer:
+      'You can access the debug page to adjust your available marks and completions.'
+  },
 ]
