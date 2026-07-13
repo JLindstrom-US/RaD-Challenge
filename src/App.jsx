@@ -33,12 +33,18 @@ function calcBaseUnlockMarks(unlocks) {
 
 function calcSubclassMarks(subclassUnlocks, freeSubclassUsed) {
   const freeEligible = ['Solar', 'Arc', 'Void', 'Stasis', 'Strand']
-  return Object.entries(subclassUnlocks || {}).reduce((sum, [name, unlocked]) => {
-    if (!unlocked) return sum
-    if (name === 'Prismatic') return sum - 10
-    if (freeEligible.includes(name)) return sum - 5
-    return sum
-  }, 0) + (freeSubclassUsed ? 5 : 0)
+  let total = 0
+
+  for (const name of ['Solar', 'Arc', 'Void', 'Stasis', 'Strand', 'Prismatic']) {
+    if (!subclassUnlocks?.[name]) continue
+    if (name === 'Prismatic') {
+      total -= 10
+    } else if (freeEligible.includes(name)) {
+      total -= freeSubclassUsed && subclassUnlocks[name] === true ? 5 : 0
+    }
+  }
+
+  return total
 }
 
 function calcExoticMarks(exotics) {
@@ -46,49 +52,49 @@ function calcExoticMarks(exotics) {
   const armorCount = Number(exotics?.armorCount || 0)
   const dismantledCount = Number(exotics?.dismantledCount || 0)
   const dualDestinyCount = Number(exotics?.dualDestinyCount || 0)
-
   return -(weaponCount * 5) - (armorCount * 5) + dismantledCount - (dualDestinyCount * 5)
 }
 
-export default function App() {
-  const [progress, setProgress] = useLocalState(STORAGE_KEY, {
-    completions: {},
-    unlocks: {},
-    subclassUnlocks: {
-      Solar: false,
-      Arc: false,
-      Void: false,
-      Stasis: false,
-      Strand: false,
-      Prismatic: false
-    },
-    freeSubclassUsed: false,
-    exotics: {
-      weaponCount: 0,
-      armorCount: 0,
-      dismantledCount: 0,
-      dualDestinyCount: 0,
-      weaponWheelUrl: 'https://example.com/exotic-weapon-wheel',
-      armorWheelUrl: 'https://example.com/exotic-armor-wheel'
-    },
-    pointOverrideEnabled: false,
-    pointOverrideValue: 0
-  })
-
-  const completions = progress.completions || {}
-  const unlocks = progress.unlocks || {}
-  const subclassUnlocks = progress.subclassUnlocks || {
+const defaults = {
+  completions: {},
+  unlocks: {},
+  subclassUnlocks: {
     Solar: false,
     Arc: false,
     Void: false,
     Stasis: false,
     Strand: false,
     Prismatic: false
-  }
+  },
+  freeSubclassUsed: false,
+  exotics: {
+    weaponCount: 0,
+    armorCount: 0,
+    dismantledCount: 0,
+    dualDestinyCount: 0,
+    weaponWheelUrl: 'https://example.com/exotic-weapon-wheel',
+    armorWheelUrl: 'https://example.com/exotic-armor-wheel'
+  },
+  pointOverrideEnabled: false,
+  pointOverrideValue: 0,
+  selectedDifficulty: 'standard',
+  selectedRuleset: 'default',
+  faqs: []
+}
+
+export default function App() {
+  const [progress, setProgress] = useLocalState(STORAGE_KEY, defaults)
+
+  const completions = progress.completions || {}
+  const unlocks = progress.unlocks || {}
+  const subclassUnlocks = progress.subclassUnlocks || defaults.subclassUnlocks
   const freeSubclassUsed = Boolean(progress.freeSubclassUsed)
-  const exotics = progress.exotics || {}
+  const exotics = progress.exotics || defaults.exotics
   const pointOverrideEnabled = Boolean(progress.pointOverrideEnabled)
   const pointOverrideValue = Number(progress.pointOverrideValue || 0)
+  const selectedDifficulty = progress.selectedDifficulty || defaults.selectedDifficulty
+  const selectedRuleset = progress.selectedRuleset || defaults.selectedRuleset
+  const faqs = progress.faqs || defaults.faqs
 
   const activityMarks = calcActivityMarks(completions)
   const baseUnlockMarks = calcBaseUnlockMarks(unlocks)
@@ -114,14 +120,7 @@ export default function App() {
   const setSubclassState = (updater) => {
     setProgress((prev) => {
       const current = {
-        subclassUnlocks: prev.subclassUnlocks || {
-          Solar: false,
-          Arc: false,
-          Void: false,
-          Stasis: false,
-          Strand: false,
-          Prismatic: false
-        },
+        subclassUnlocks: prev.subclassUnlocks || defaults.subclassUnlocks,
         freeSubclassUsed: Boolean(prev.freeSubclassUsed)
       }
       const next = typeof updater === 'function' ? updater(current) : updater
@@ -135,7 +134,7 @@ export default function App() {
 
   const setExotics = (updater) => {
     setProgress((prev) => {
-      const next = typeof updater === 'function' ? updater(prev.exotics || {}) : updater
+      const next = typeof updater === 'function' ? updater(prev.exotics || defaults.exotics) : updater
       return { ...prev, exotics: next }
     })
   }
@@ -148,10 +147,38 @@ export default function App() {
     }))
   }
 
+  const setSelectedDifficulty = (selectedDifficulty) => {
+    setProgress((prev) => ({ ...prev, selectedDifficulty }))
+  }
+
+  const setSelectedRuleset = (selectedRuleset) => {
+    setProgress((prev) => ({ ...prev, selectedRuleset }))
+  }
+
+  const setFaqs = (updater) => {
+    setProgress((prev) => {
+      const next = typeof updater === 'function' ? updater(prev.faqs || []) : updater
+      return { ...prev, faqs: next }
+    })
+  }
+
   return (
     <Routes>
       <Route path="/" element={<HomeRedirect />} />
-      <Route path="/rules" element={<RulesPage nav={<TopNav availableMarks={availableMarks} />} />} />
+      <Route
+        path="/rules"
+        element={
+          <RulesPage
+            nav={<TopNav availableMarks={availableMarks} />}
+            selectedDifficulty={selectedDifficulty}
+            selectedRuleset={selectedRuleset}
+            setSelectedDifficulty={setSelectedDifficulty}
+            setSelectedRuleset={setSelectedRuleset}
+            faqs={faqs}
+            setFaqs={setFaqs}
+          />
+        }
+      />
       <Route
         path="/activities"
         element={

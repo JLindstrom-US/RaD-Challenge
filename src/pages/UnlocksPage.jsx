@@ -41,37 +41,50 @@ function UnlockGroup({ title, groupKey, items, unlocks, setUnlocks }) {
 function SubclassGroup({ subclassUnlocks, freeSubclassUsed, setSubclassState }) {
   const freeEligible = ['Solar', 'Arc', 'Void', 'Stasis', 'Strand']
 
+  const totalChecked = Object.values(subclassUnlocks || {}).filter(Boolean).length
+
   const toggleSubclass = (name) => {
     const isUnlocked = Boolean(subclassUnlocks[name])
 
-    if (isUnlocked) {
-      setSubclassState((prev) => ({
-        subclassUnlocks: {
-          ...prev.subclassUnlocks,
-          [name]: false
-        },
-        freeSubclassUsed: prev.freeSubclassUsed
-      }))
-      return
-    }
-
     setSubclassState((prev) => {
+      const currentUnlocks = prev.subclassUnlocks || {
+        Solar: false,
+        Arc: false,
+        Void: false,
+        Stasis: false,
+        Strand: false,
+        Prismatic: false
+      }
+      const activeCount = Object.values(currentUnlocks).filter(Boolean).length
+      const turningOn = !currentUnlocks[name]
+
+      if (!turningOn) {
+        return {
+          subclassUnlocks: {
+            ...currentUnlocks,
+            [name]: false
+          },
+          freeSubclassUsed: activeCount - 1 > 0 ? prev.freeSubclassUsed : false
+        }
+      }
+
       const isFreeEligible = freeEligible.includes(name)
-      const shouldConsumeFree = isFreeEligible && !prev.freeSubclassUsed
+      const shouldBeFree = isFreeEligible && activeCount === 0 && !prev.freeSubclassUsed
 
       return {
         subclassUnlocks: {
-          ...prev.subclassUnlocks,
+          ...currentUnlocks,
           [name]: true
         },
-        freeSubclassUsed: prev.freeSubclassUsed || shouldConsumeFree
+        freeSubclassUsed: prev.freeSubclassUsed || shouldBeFree
       }
     })
   }
 
   const getCostLabel = (name) => {
     if (name === 'Prismatic') return '10 Marks'
-    if (!freeSubclassUsed) return 'Free first unlock, then 5 Marks'
+    if (subclassUnlocks[name]) return freeSubclassUsed ? '5 Marks' : 'Free'
+    if (totalChecked === 0 && freeEligible.includes(name)) return 'Free first unlock'
     return '5 Marks'
   }
 
@@ -79,7 +92,7 @@ function SubclassGroup({ subclassUnlocks, freeSubclassUsed, setSubclassState }) 
     <section className="panel activity-panel">
       <h2>Subclasses</h2>
       <p className="section-text">
-        Unlock all 6 if you want. Your first Solar, Arc, Void, Stasis, or Strand unlock is free. Every later one costs 5 Marks. Prismatic always costs 10 Marks.
+        Unlock all 6 if you want. If none are checked, the first Solar, Arc, Void, Stasis, or Strand choice is free. Prismatic always costs 10 Marks.
       </p>
       <div className="unlock-list">
         {unlockGroups.subclasses.map((item) => {
@@ -118,7 +131,7 @@ export default function UnlocksPage({
       nav={nav}
       eyebrow="Unlocks"
       title="Relics and Subclasses"
-      intro="Check an unlock to remove its points. Subclasses can all be unlocked, but only the first non-Prismatic subclass is free."
+      intro="Check an unlock to remove its points. Subclasses can all be unlocked, and if none are checked, the first free-eligible one is free again."
     >
       <section className="unlock-grid">
         <UnlockGroup

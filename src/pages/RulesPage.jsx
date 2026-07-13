@@ -7,18 +7,35 @@ const rulesetOptions = [
   { id: 'expert', label: 'Expert Ruleset', description: 'Adds subclass, relic, and exotic gates.' }
 ]
 
-export default function RulesPage({ nav }) {
-  const [goal, setGoal] = useState(goals[0].title)
-  const [ruleset, setRuleset] = useState('default')
+export default function RulesPage({
+  nav,
+  selectedDifficulty,
+  selectedRuleset,
+  setSelectedDifficulty,
+  setSelectedRuleset,
+  faqs,
+  setFaqs
+}) {
+  const [faqQuestion, setFaqQuestion] = useState('')
+  const [faqAnswer, setFaqAnswer] = useState('')
 
-  const activeRules = useMemo(() => rules[ruleset] || rules.default, [ruleset])
+  const activeRules = useMemo(() => rules[selectedRuleset] || rules.default, [selectedRuleset])
+
+  const addFaq = () => {
+    const q = faqQuestion.trim()
+    const a = faqAnswer.trim()
+    if (!q || !a) return
+    setFaqs((prev) => [...prev, { question: q, answer: a }])
+    setFaqQuestion('')
+    setFaqAnswer('')
+  }
 
   return (
     <Layout
       nav={nav}
       eyebrow="Rules"
       title="Choose your challenge"
-      intro="Pick a goal and ruleset. The selected cards will stand out so the current setup is always obvious."
+      intro="Pick a goal and ruleset. Your selection is saved automatically and restored when you return."
     >
       <section className="panel activity-panel">
         <h2>Select Your Goal</h2>
@@ -27,9 +44,9 @@ export default function RulesPage({ nav }) {
             <button
               key={option.title}
               type="button"
-              className={`choice-card ${goal === option.title ? 'selected' : ''}`}
-              onClick={() => setGoal(option.title)}
-              aria-pressed={goal === option.title}
+              className={`choice-card ${selectedDifficulty === option.tier ? 'selected' : ''}`}
+              onClick={() => setSelectedDifficulty(option.tier)}
+              aria-pressed={selectedDifficulty === option.tier}
             >
               <span className="choice-label">{option.tier}</span>
               <span className="choice-description">{option.title}</span>
@@ -46,9 +63,9 @@ export default function RulesPage({ nav }) {
             <button
               key={option.id}
               type="button"
-              className={`choice-card ${ruleset === option.id ? 'selected' : ''}`}
-              onClick={() => setRuleset(option.id)}
-              aria-pressed={ruleset === option.id}
+              className={`choice-card ${selectedRuleset === option.id ? 'selected' : ''}`}
+              onClick={() => setSelectedRuleset(option.id)}
+              aria-pressed={selectedRuleset === option.id}
             >
               <span className="choice-label">{option.label}</span>
               <span className="choice-description">{option.description}</span>
@@ -60,7 +77,7 @@ export default function RulesPage({ nav }) {
       <section className="panel activity-panel">
         <h2>Selected rules</h2>
         <p className="section-text">
-          Goal: <strong>{goal}</strong> · Ruleset: <strong>{ruleset}</strong>
+          Goal: <strong>{selectedDifficulty}</strong> · Ruleset: <strong>{selectedRuleset}</strong>
         </p>
         <div className="rules-list">
           {activeRules.map((rule, index) => (
@@ -69,6 +86,41 @@ export default function RulesPage({ nav }) {
               <p>{rule}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="panel activity-panel">
+        <h2>FAQ</h2>
+        <div className="faq-list">
+          {faqs.map((item, index) => (
+            <details className="faq-item" key={`${item.question}-${index}`}>
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+
+        <div className="faq-form">
+          <label className="field">
+            <span>Question</span>
+            <input
+              value={faqQuestion}
+              onChange={(e) => setFaqQuestion(e.target.value)}
+              placeholder="Add a new FAQ question"
+            />
+          </label>
+          <label className="field">
+            <span>Answer</span>
+            <textarea
+              value={faqAnswer}
+              onChange={(e) => setFaqAnswer(e.target.value)}
+              placeholder="Add the answer"
+              rows={4}
+            />
+          </label>
+          <button type="button" className="primary-button" onClick={addFaq}>
+            Add FAQ
+          </button>
         </div>
       </section>
     </Layout>
