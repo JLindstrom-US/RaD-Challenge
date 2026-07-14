@@ -99,15 +99,12 @@ export default function ExoticsPage({ nav, exotics, setExotics }) {
       nav={nav}
       eyebrow="Exotics"
       title="Exotic Tracking"
-      intro="Spin for a random exotic weapon, then choose a class to spin for matching exotic armor."
+      intro="Spin for a Random Exotic"
     >
       <section className="panel activity-panel">
         <div className="section-header wheel-section-header">
           <div>
-            <h2>Animated Wheels</h2>
-            <p className="section-text">
-              The weapon wheel is shared. The armor wheel changes based on the selected class.
-            </p>
+            <h2>Wheels</h2>
           </div>
 
           <fieldset className="class-selector">

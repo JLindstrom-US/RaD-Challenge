@@ -126,7 +126,7 @@ export default function UnlocksPage({
     <Layout
       nav={nav}
       eyebrow="Unlocks"
-      title="Unlock Tracking"
+      title="Unlocks"
       intro="Track relics, subclasses, aspects, and fragments as you progress through the challenge."
     >
       <section className="panel activity-panel">
@@ -135,7 +135,6 @@ export default function UnlocksPage({
         </div>
 
         <UnlockGroup
-          title="Relics"
           groupKey="relics"
           items={unlockGroups.relics}
           unlocks={unlocks}
@@ -157,7 +156,6 @@ export default function UnlocksPage({
         </div>
 
         <UnlockGroup
-          title="Aspects"
           groupKey="aspects"
           items={unlockGroups.aspects}
           unlocks={unlocks}
@@ -171,7 +169,6 @@ export default function UnlocksPage({
         </div>
 
         <UnlockGroup
-          title="Fragments"
           groupKey="fragments"
           items={unlockGroups.fragments}
           unlocks={unlocks}

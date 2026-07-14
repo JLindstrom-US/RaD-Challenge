@@ -23,5 +23,10 @@ export const faqs = [
     question: 'What If I Accidentally Add A Completion?',
     answer:
       'Use the Debug page to adjust your available marks and completion counts.'
-  }
+  },
+  {
+    question: 'Does the Flawless Raid Rule include my Fireteam Member Deaths?',
+    answer:
+      'No, I cant assume your allies are also doing this challenge so it feels wrong to enforce that. If your fireteam wipes however, that does count as a death.'
+  },
 ]

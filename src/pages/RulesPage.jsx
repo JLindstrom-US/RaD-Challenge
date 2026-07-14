@@ -38,7 +38,7 @@ export default function RulesPage({
         <div className="section-header">
           <h2>Select Your Goal</h2>
           <p className="section-text">
-            Pick the challenge tier you want to run.
+            Pick the Difficulty you want to Play on.
           </p>
         </div>
 
@@ -63,7 +63,7 @@ export default function RulesPage({
         <div className="section-header">
           <h2>Ruleset</h2>
           <p className="section-text">
-            Switch between the standard and restricted challenge formats.
+            Switch between the Default and Expert challenge rules.
           </p>
         </div>
 

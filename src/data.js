@@ -75,15 +75,15 @@ export const allActivities = [...raids, ...dungeons]
 
 export const rules = {
   default: [
-    'Must be a "Fresh" Character — No Vault Allowed. Start with White Rarity Gear from Collections.',
-    'You can only use Raid and Dungeon Drops. No World Drops.',
-    'No Checkpoints. Full Clears Only.',
+    'No Vault Allowed. Start with White Rarity Gear from Collections.',
+    'You can only use Raid and Dungeon Drops. No World Drops, Including Exotics.',
+    'No Checkpoints, Full Clears Only.',
     'You may use any Exotic Armor or Weapons from Collections.'
   ],
   expert: [
-    'Must be a "Fresh" Character — No Vault Allowed. Start with White Rarity Gear from Collections.',
-    'You can only use Raid and Dungeon Drops. No World Drops.',
-    'No Checkpoints. Full Clears Only.',
+    'No Vault Allowed. Start with White Rarity Gear from Collections.',
+    'You can only use Raid and Dungeon Drops. No World Drops, Including Exotics.',
+    'No Checkpoints, Full Clears Only.',
     'First Subclass is Free. No Aspect or Fragment Slots until Redeemed. Cannot use Prismatic until Redeemed.',
     'No Relic Perks Allowed until Redeemed.',
     'Exotic Access Unlocks once All Gear Slots are Tier 5.'
