@@ -10,12 +10,23 @@ function mergeWithDefaults(defaultValue, storedValue) {
   }
 
   if (isPlainObject(defaultValue)) {
-    const safeStored = isPlainObject(storedValue) ? storedValue : {}
+    if (!isPlainObject(storedValue)) {
+      return defaultValue
+    }
 
-    return Object.keys(defaultValue).reduce((acc, key) => {
-      acc[key] = mergeWithDefaults(defaultValue[key], safeStored[key])
-      return acc
-    }, {})
+    const defaultKeys = Object.keys(defaultValue)
+
+    if (defaultKeys.length === 0) {
+      return storedValue
+    }
+
+    const merged = { ...storedValue }
+
+    for (const key of defaultKeys) {
+      merged[key] = mergeWithDefaults(defaultValue[key], storedValue[key])
+    }
+
+    return merged
   }
 
   return storedValue === undefined ? defaultValue : storedValue
