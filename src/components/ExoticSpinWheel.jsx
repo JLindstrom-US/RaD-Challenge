@@ -28,31 +28,51 @@ export default function ExoticSpinWheel({ title, items = [] }) {
   const [selectedItem, setSelectedItem] = useState(null)
 
   const trackRef = useRef(null)
+  const animationRef = useRef(null)
   const timeoutRef = useRef(null)
-  const rafOneRef = useRef(null)
-  const rafTwoRef = useRef(null)
 
   useEffect(() => {
     setIsSpinning(false)
     setSelectedItem(null)
 
+    if (animationRef.current) {
+      animationRef.current.cancel()
+      animationRef.current = null
+    }
+
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+
     if (trackRef.current) {
-      trackRef.current.style.transition = 'none'
       trackRef.current.style.transform = 'translateY(0px)'
     }
 
     return () => {
-      if (timeoutRef.current) window.clearTimeout(timeoutRef.current)
-      if (rafOneRef.current) window.cancelAnimationFrame(rafOneRef.current)
-      if (rafTwoRef.current) window.cancelAnimationFrame(rafTwoRef.current)
+      if (animationRef.current) {
+        animationRef.current.cancel()
+        animationRef.current = null
+      }
+
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
     }
   }, [title, safeItems])
 
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) window.clearTimeout(timeoutRef.current)
-      if (rafOneRef.current) window.cancelAnimationFrame(rafOneRef.current)
-      if (rafTwoRef.current) window.cancelAnimationFrame(rafTwoRef.current)
+      if (animationRef.current) {
+        animationRef.current.cancel()
+        animationRef.current = null
+      }
+
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
     }
   }, [])
 
@@ -66,31 +86,45 @@ export default function ExoticSpinWheel({ title, items = [] }) {
     const targetIndex = baseIndex + randomIndex
     const targetOffset = (targetIndex - CENTER_INDEX) * ROW_HEIGHT
 
+    if (animationRef.current) {
+      animationRef.current.cancel()
+      animationRef.current = null
+    }
+
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+
     const track = trackRef.current
-
-    if (timeoutRef.current) window.clearTimeout(timeoutRef.current)
-    if (rafOneRef.current) window.cancelAnimationFrame(rafOneRef.current)
-    if (rafTwoRef.current) window.cancelAnimationFrame(rafTwoRef.current)
-
     setIsSpinning(true)
     setSelectedItem(null)
-
-    track.style.transition = 'none'
     track.style.transform = 'translateY(0px)'
 
-    void track.offsetHeight
+    const animation = track.animate(
+      [
+        { transform: 'translateY(0px)' },
+        { transform: `translateY(${-targetOffset}px)` }
+      ],
+      {
+        duration: SPIN_DURATION_MS,
+        easing: SPIN_EASING,
+        fill: 'forwards'
+      }
+    )
 
-    rafOneRef.current = window.requestAnimationFrame(() => {
-      rafTwoRef.current = window.requestAnimationFrame(() => {
-        track.style.transition = `transform ${SPIN_DURATION_MS}ms ${SPIN_EASING}`
-        track.style.transform = `translateY(${-targetOffset}px)`
-      })
-    })
+    animationRef.current = animation
 
-    timeoutRef.current = window.setTimeout(() => {
+    animation.onfinish = () => {
+      track.style.transform = `translateY(${-targetOffset}px)`
+      animationRef.current = null
       setSelectedItem(winner)
       setIsSpinning(false)
-    }, SPIN_DURATION_MS)
+    }
+
+    animation.oncancel = () => {
+      animationRef.current = null
+    }
   }
 
   return (

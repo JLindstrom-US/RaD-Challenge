@@ -1,15 +1,30 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Layout from '../components/Layout'
 import { allActivities } from '../data'
 
+function normalizeType(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+}
+
+function getActivityType(activity) {
+  const explicitType = normalizeType(activity?.type)
+
+  if (explicitType === 'raid' || explicitType === 'raids') return 'raid'
+  if (explicitType === 'dungeon' || explicitType === 'dungeons') return 'dungeon'
+
+  return activity?.marks >= 2 ? 'raid' : 'dungeon'
+}
+
 function ActivityList({ title, items, completions }) {
   return (
-    <section className="activity-list">
+    <section className="activity-list" aria-label={title}>
       <h3>{title}</h3>
 
       <div className="grid-two">
         {items.map((item) => {
-          const count = completions[item.name] || 0
+          const count = completions?.[item.name] || 0
 
           return (
             <article key={item.name} className="activity-row">
@@ -33,16 +48,34 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
   const [selected, setSelected] = useState('')
   const [pulse, setPulse] = useState(false)
 
-  const selectedActivity = useMemo(
-    () => allActivities.find((activity) => activity.name === selected) || null,
-    [selected]
-  )
+  const groupedActivities = useMemo(() => {
+    const raids = []
+    const dungeons = []
+
+    for (const activity of allActivities) {
+      if (getActivityType(activity) === 'raid') {
+        raids.push(activity)
+      } else {
+        dungeons.push(activity)
+      }
+    }
+
+    return { raids, dungeons }
+  }, [])
+
+  const orderedActivities = useMemo(() => {
+    return [...groupedActivities.raids, ...groupedActivities.dungeons]
+  }, [groupedActivities])
+
+  const selectedActivity = useMemo(() => {
+    return orderedActivities.find((activity) => activity.name === selected) || null
+  }, [orderedActivities, selected])
 
   useEffect(() => {
-    if (!selected && allActivities.length) {
-      setSelected(allActivities[0].name)
+    if (!selected && orderedActivities.length) {
+      setSelected(orderedActivities[0].name)
     }
-  }, [selected, setSelected])
+  }, [selected, orderedActivities])
 
   useEffect(() => {
     if (!pulse) return
@@ -63,13 +96,6 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
     setPulse(true)
   }
 
-  const activityByType = useMemo(() => {
-    return {
-      raids: allActivities.filter((activity) => activity.marks >= 2),
-      dungeons: allActivities.filter((activity) => activity.marks <= 1)
-    }
-  }, [])
-
   return (
     <Layout
       nav={nav}
@@ -89,11 +115,21 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
           <label className="field">
             <span>Activity</span>
             <select value={selected} onChange={(e) => setSelected(e.target.value)}>
-              {allActivities.map((activity) => (
-                <option key={activity.name} value={activity.name}>
-                  {activity.name} ({activity.marks} Marks)
-                </option>
-              ))}
+              <optgroup label="Raids">
+                {groupedActivities.raids.map((activity) => (
+                  <option key={activity.name} value={activity.name}>
+                    {activity.name} ({activity.marks} Marks)
+                  </option>
+                ))}
+              </optgroup>
+
+              <optgroup label="Dungeons">
+                {groupedActivities.dungeons.map((activity) => (
+                  <option key={activity.name} value={activity.name}>
+                    {activity.name} ({activity.marks} Marks)
+                  </option>
+                ))}
+              </optgroup>
             </select>
           </label>
 
@@ -116,7 +152,7 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
       <section className="panel activity-panel">
         <ActivityList
           title="Raids"
-          items={activityByType.raids}
+          items={groupedActivities.raids}
           completions={completions}
         />
       </section>
@@ -124,7 +160,7 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
       <section className="panel activity-panel">
         <ActivityList
           title="Dungeons"
-          items={activityByType.dungeons}
+          items={groupedActivities.dungeons}
           completions={completions}
         />
       </section>
