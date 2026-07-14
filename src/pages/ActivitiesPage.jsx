@@ -1,26 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import Layout from '../components/Layout'
-import { allActivities } from '../data'
-
-function cleanString(value) {
-  return String(value || '')
-    .normalize('NFKC')
-    .trim()
-    .toLowerCase()
-}
-
-function getActivityType(activity) {
-  const rawType = cleanString(activity?.type)
-  const rawCategory = cleanString(activity?.category)
-  const rawKind = cleanString(activity?.kind)
-
-  const value = rawType || rawCategory || rawKind
-
-  if (value === 'raid' || value === 'raids') return 'raid'
-  if (value === 'dungeon' || value === 'dungeons') return 'dungeon'
-
-  return 'dungeon'
-}
+import { raids, dungeons } from '../data'
 
 function ActivityList({ title, items, completions }) {
   return (
@@ -53,41 +33,27 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
   const [selected, setSelected] = useState('')
   const [pulse, setPulse] = useState(false)
 
-  const groupedActivities = useMemo(() => {
-    const raids = []
-    const dungeons = []
-
-    for (const activity of allActivities) {
-      const resolvedType = getActivityType(activity)
-
-      if (resolvedType === 'raid') {
-        raids.push(activity)
-      } else {
-        dungeons.push(activity)
-      }
-    }
-
-    return { raids, dungeons }
+  const allActivities = useMemo(() => {
+    return [...raids, ...dungeons]
   }, [])
 
-  const orderedActivities = useMemo(() => {
-    return [...groupedActivities.raids, ...groupedActivities.dungeons]
-  }, [groupedActivities])
-
   const selectedActivity = useMemo(() => {
-    return orderedActivities.find((activity) => activity.name === selected) || null
-  }, [orderedActivities, selected])
+    return allActivities.find((activity) => activity.name === selected) || null
+  }, [allActivities, selected])
 
   useEffect(() => {
-    if (!selected && orderedActivities.length) {
-      setSelected(orderedActivities[0].name)
+    if (!selected && allActivities.length) {
+      setSelected(allActivities[0].name)
     }
-  }, [selected, orderedActivities])
+  }, [selected, allActivities])
 
   useEffect(() => {
     if (!pulse) return
 
-    const timeoutId = window.setTimeout(() => setPulse(false), 180)
+    const timeoutId = window.setTimeout(() => {
+      setPulse(false)
+    }, 180)
+
     return () => window.clearTimeout(timeoutId)
   }, [pulse])
 
@@ -123,7 +89,7 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
             <span>Activity</span>
             <select value={selected} onChange={(e) => setSelected(e.target.value)}>
               <optgroup label="Raids">
-                {groupedActivities.raids.map((activity) => (
+                {raids.map((activity) => (
                   <option key={activity.name} value={activity.name}>
                     {activity.name} ({activity.marks} Marks)
                   </option>
@@ -131,7 +97,7 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
               </optgroup>
 
               <optgroup label="Dungeons">
-                {groupedActivities.dungeons.map((activity) => (
+                {dungeons.map((activity) => (
                   <option key={activity.name} value={activity.name}>
                     {activity.name} ({activity.marks} Marks)
                   </option>
@@ -159,7 +125,7 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
       <section className="panel activity-panel">
         <ActivityList
           title="Raids"
-          items={groupedActivities.raids}
+          items={raids}
           completions={completions}
         />
       </section>
@@ -167,7 +133,7 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
       <section className="panel activity-panel">
         <ActivityList
           title="Dungeons"
-          items={groupedActivities.dungeons}
+          items={dungeons}
           completions={completions}
         />
       </section>
