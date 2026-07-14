@@ -5,6 +5,7 @@ const VISIBLE_ROWS = 3
 const CENTER_INDEX = Math.floor(VISIBLE_ROWS / 2)
 const SPIN_LOOPS = 6
 const SPIN_DURATION_MS = 5200
+const SPIN_EASING = 'cubic-bezier(0.12, 0.8, 0.2, 1)'
 
 function normalizeItems(items) {
   return Array.isArray(items) ? items.filter(Boolean) : []
@@ -25,35 +26,38 @@ export default function ExoticSpinWheel({ title, items = [] }) {
 
   const [isSpinning, setIsSpinning] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
-  const [translateY, setTranslateY] = useState(0)
-  const [transitionEnabled, setTransitionEnabled] = useState(false)
 
-  const timeoutRef = useRef(null)
   const trackRef = useRef(null)
+  const timeoutRef = useRef(null)
+  const rafOneRef = useRef(null)
+  const rafTwoRef = useRef(null)
 
   useEffect(() => {
-    setSelectedItem(null)
     setIsSpinning(false)
-    setTransitionEnabled(false)
-    setTranslateY(0)
+    setSelectedItem(null)
+
+    if (trackRef.current) {
+      trackRef.current.style.transition = 'none'
+      trackRef.current.style.transform = 'translateY(0px)'
+    }
 
     return () => {
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current)
-      }
+      if (timeoutRef.current) window.clearTimeout(timeoutRef.current)
+      if (rafOneRef.current) window.cancelAnimationFrame(rafOneRef.current)
+      if (rafTwoRef.current) window.cancelAnimationFrame(rafTwoRef.current)
     }
   }, [title, safeItems])
 
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current)
-      }
+      if (timeoutRef.current) window.clearTimeout(timeoutRef.current)
+      if (rafOneRef.current) window.cancelAnimationFrame(rafOneRef.current)
+      if (rafTwoRef.current) window.cancelAnimationFrame(rafTwoRef.current)
     }
   }, [])
 
   const handleSpin = () => {
-    if (!safeItems.length || isSpinning) return
+    if (!safeItems.length || isSpinning || !trackRef.current) return
 
     const randomIndex = Math.floor(Math.random() * safeItems.length)
     const winner = safeItems[randomIndex]
@@ -62,23 +66,24 @@ export default function ExoticSpinWheel({ title, items = [] }) {
     const targetIndex = baseIndex + randomIndex
     const targetOffset = (targetIndex - CENTER_INDEX) * ROW_HEIGHT
 
-    if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current)
-    }
+    const track = trackRef.current
+
+    if (timeoutRef.current) window.clearTimeout(timeoutRef.current)
+    if (rafOneRef.current) window.cancelAnimationFrame(rafOneRef.current)
+    if (rafTwoRef.current) window.cancelAnimationFrame(rafTwoRef.current)
 
     setIsSpinning(true)
     setSelectedItem(null)
-    setTransitionEnabled(false)
-    setTranslateY(0)
 
-    window.requestAnimationFrame(() => {
-      if (trackRef.current) {
-        void trackRef.current.offsetHeight
-      }
+    track.style.transition = 'none'
+    track.style.transform = 'translateY(0px)'
 
-      window.requestAnimationFrame(() => {
-        setTransitionEnabled(true)
-        setTranslateY(-targetOffset)
+    void track.offsetHeight
+
+    rafOneRef.current = window.requestAnimationFrame(() => {
+      rafTwoRef.current = window.requestAnimationFrame(() => {
+        track.style.transition = `transform ${SPIN_DURATION_MS}ms ${SPIN_EASING}`
+        track.style.transform = `translateY(${-targetOffset}px)`
       })
     })
 
@@ -102,11 +107,7 @@ export default function ExoticSpinWheel({ title, items = [] }) {
           <div className="reel-center-highlight" />
           <div className="reel-fade reel-fade--bottom" />
 
-          <div
-            ref={trackRef}
-            className={`reel-track ${transitionEnabled ? 'is-animated' : ''}`}
-            style={{ transform: `translateY(${translateY}px)` }}
-          >
+          <div ref={trackRef} className="reel-track">
             {reelItems.map((item, index) => (
               <div key={`${title}-${item}-${index}`} className="reel-row">
                 <span className="reel-row-label">{item}</span>
