@@ -1,4 +1,12 @@
+import { useMemo, useState } from 'react'
 import Layout from '../components/Layout'
+import ExoticSpinWheel from '../components/ExoticSpinWheel'
+import {
+  exoticWeapons,
+  exoticArmorHunter,
+  exoticArmorWarlock,
+  exoticArmorTitan
+} from '../data/exoticWheels'
 
 function CounterRow({ label, value, onAdd, onRemove, note }) {
   return (
@@ -8,11 +16,21 @@ function CounterRow({ label, value, onAdd, onRemove, note }) {
         {note ? <span className="unlock-cost">{note}</span> : null}
       </div>
       <div className="counter-controls">
-        <button type="button" className="secondary-button" onClick={onRemove} aria-label={`Remove one ${label}`}>
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={onRemove}
+          aria-label={`Remove one ${label}`}
+        >
           -
         </button>
         <strong className="counter-value">{value}</strong>
-        <button type="button" className="secondary-button" onClick={onAdd} aria-label={`Add one ${label}`}>
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={onAdd}
+          aria-label={`Add one ${label}`}
+        >
           +
         </button>
       </div>
@@ -20,14 +38,35 @@ function CounterRow({ label, value, onAdd, onRemove, note }) {
   )
 }
 
-function WheelTile({ title, url, description }) {
+function ClassSelector({ value, onChange }) {
+  const options = ['Hunter', 'Warlock', 'Titan']
+
   return (
-    <a className="wheel-tile" href={url} target="_blank" rel="noopener noreferrer">
-      <span className="wheel-kicker">External Link</span>
-      <strong>{title}</strong>
-      <span>{description}</span>
-      <span className="wheel-url">{url}</span>
-    </a>
+    <fieldset className="class-selector">
+      <legend className="class-selector-label">Armor Class</legend>
+      <div className="class-selector-options" role="radiogroup" aria-label="Armor class">
+        {options.map((option) => {
+          const checked = value === option
+
+          return (
+            <label
+              key={option}
+              className={`class-chip ${checked ? 'is-selected' : ''}`}
+            >
+              <input
+                className="sr-only"
+                type="radio"
+                name="armor-class"
+                value={option}
+                checked={checked}
+                onChange={() => onChange(option)}
+              />
+              <span>{option}</span>
+            </label>
+          )
+        })}
+      </div>
+    </fieldset>
   )
 }
 
@@ -37,27 +76,47 @@ export default function ExoticsPage({ nav, exotics, setExotics }) {
   const dismantledCount = Number(exotics.dismantledCount || 0)
   const dualDestinyCount = Number(exotics.dualDestinyCount || 0)
 
+  const [selectedClass, setSelectedClass] = useState('Hunter')
+
   const update = (patch) => setExotics((prev) => ({ ...prev, ...patch }))
+
+  const armorItems = useMemo(() => {
+    if (selectedClass === 'Titan') return exoticArmorTitan
+    if (selectedClass === 'Warlock') return exoticArmorWarlock
+    return exoticArmorHunter
+  }, [selectedClass])
 
   return (
     <Layout
       nav={nav}
       eyebrow="Exotics"
       title="Exotic Redemptions"
-      intro="Spend Marks to Unlock Exotics, Earn Marks for Dismantling Exotics"
+      intro="Spend Marks to unlock Exotics, and earn Marks for dismantling them."
     >
       <section className="panel activity-panel">
-        <h2>Wheels</h2>
-        <div className="wheel-grid">
-          <WheelTile
+        <div className="wheel-section-header">
+          <div>
+            <h2>Exotic Wheels</h2>
+            <p className="section-text">
+              Spin for a random Exotic weapon, then choose your class to spin for matching Exotic armor.
+            </p>
+          </div>
+
+          <ClassSelector value={selectedClass} onChange={setSelectedClass} />
+        </div>
+
+        <div className="wheel-grid wheel-grid--interactive">
+          <ExoticSpinWheel
             title="Exotic Weapon Wheel"
-            url={exotics.weaponWheelUrl || 'https://example.com/exotic-weapon-wheel'}
-            description="Placeholder link for the weapon wheel."
+            items={exoticWeapons}
+            storageKey="weapon-wheel"
           />
-          <WheelTile
-            title="Exotic Armor Wheel"
-            url={exotics.armorWheelUrl || 'https://example.com/exotic-armor-wheel'}
-            description="Placeholder link for the armor wheel."
+
+          <ExoticSpinWheel
+            key={selectedClass}
+            title={`${selectedClass} Exotic Armor Wheel`}
+            items={armorItems}
+            storageKey={`armor-wheel-${selectedClass.toLowerCase()}`}
           />
         </div>
       </section>

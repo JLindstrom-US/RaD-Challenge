@@ -46,13 +46,13 @@ export const dungeons = [
 export const allActivities = [...raids, ...dungeons]
 
 export const rules = {
-  default: [
+  Default: [
     'Must be a "Fresh" Character — No Vault Allowed. Start with White Rarity Gear from Collections.',
     'You can only use Raid and Dungeon Drops. No World Drops.',
     'No Checkpoints. Full Clears Only.',
     'You may use any Exotic Armor or Weapons from Collections.'
   ],
-  expert: [
+  Expert: [
     'Must be a "Fresh" Character — No Vault Allowed. Start with White Rarity Gear from Collections.',
     'You can only use Raid and Dungeon Drops. No World Drops.',
     'No Checkpoints. Full Clears Only.',
