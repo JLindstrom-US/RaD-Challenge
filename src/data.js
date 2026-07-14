@@ -46,7 +46,7 @@ export const raids = [
   { name: "Salvation's Edge - Normal", marks: 2 },
   { name: "Salvation's Edge - Master", marks: 3 },
   { name: 'Deserted Perpetual - Normal', marks: 2 },
-  { name: 'Deserted Perpetual - Master', marks: 3 }
+  { name: 'Deserted Perpetual - Epic', marks: 4 }
 ]
 
 export const dungeons = [
@@ -75,14 +75,14 @@ export const allActivities = [...raids, ...dungeons]
 
 export const rules = {
   default: [
-    'No Vault Allowed. Start with White Rarity Gear from Collections.',
-    'You can only use Raid and Dungeon Drops. No World Drops, Including Exotics.',
+    'No Vault Allowed. Start with White Rarity Gear from Collections. Green Rarity Heavy',
+    'You can only use Raid and Dungeon Drops. No World Drops.',
     'No Checkpoints, Full Clears Only.',
     'You may use any Exotic Armor or Weapons from Collections.'
   ],
   expert: [
-    'No Vault Allowed. Start with White Rarity Gear from Collections.',
-    'You can only use Raid and Dungeon Drops. No World Drops, Including Exotics.',
+    'No Vault Allowed. Start with White Rarity Gear from Collections. Green Rarity Heavy',
+    'You can only use Raid and Dungeon Drops. No World Drops, Including Exotic World Drops',
     'No Checkpoints, Full Clears Only.',
     'First Subclass is Free. No Aspect or Fragment Slots until Redeemed. Cannot use Prismatic until Redeemed.',
     'No Relic Perks Allowed until Redeemed.',

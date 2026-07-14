@@ -74,13 +74,13 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
       nav={nav}
       eyebrow="Activities"
       title="Completion Tracker"
-      intro="Track raid and dungeon completions, then add runs as you clear them."
+      intro="Your first completion of each activity is worth full points. Repeated completions are worth half."
     >
       <section className="panel activity-panel">
         <div className="section-header">
           <h2>Select Activity</h2>
           <p className="section-text">
-            Pick the activity you want to increment.
+            Pick the activity to mark as completed.
           </p>
         </div>
 
@@ -107,7 +107,7 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
           </label>
 
           <div className="tracker-stat">
-            <span>Selected Value</span>
+            <span>Marks Value</span>
             <strong>{selectedActivity ? `${selectedActivity.marks} Marks` : '—'}</strong>
           </div>
 

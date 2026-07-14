@@ -29,4 +29,9 @@ export const faqs = [
     answer:
       'No, I cant assume your allies are also doing this challenge so it feels wrong to enforce that. If your fireteam wipes however, that does count as a death.'
   },
+  {
+    question: 'How Do I Get Raid Weapons?',
+    answer:
+      'If you have not completed all deepsights, you can use the random rolls from the drop pool. If you have deepsights completed, upon raid completion you can select 1 raid weapon from that raid to craft. It must start at level 1 and you cannot pay currency to level it.'
+  },
 ]
