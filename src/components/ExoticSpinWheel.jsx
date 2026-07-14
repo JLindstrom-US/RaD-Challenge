@@ -29,6 +29,7 @@ export default function ExoticSpinWheel({ title, items = [] }) {
   const [transitionEnabled, setTransitionEnabled] = useState(false)
 
   const timeoutRef = useRef(null)
+  const trackRef = useRef(null)
 
   useEffect(() => {
     setSelectedItem(null)
@@ -71,6 +72,10 @@ export default function ExoticSpinWheel({ title, items = [] }) {
     setTranslateY(0)
 
     window.requestAnimationFrame(() => {
+      if (trackRef.current) {
+        void trackRef.current.offsetHeight
+      }
+
       window.requestAnimationFrame(() => {
         setTransitionEnabled(true)
         setTranslateY(-targetOffset)
@@ -98,15 +103,12 @@ export default function ExoticSpinWheel({ title, items = [] }) {
           <div className="reel-fade reel-fade--bottom" />
 
           <div
+            ref={trackRef}
             className={`reel-track ${transitionEnabled ? 'is-animated' : ''}`}
             style={{ transform: `translateY(${translateY}px)` }}
           >
             {reelItems.map((item, index) => (
-              <div
-                key={`${title}-${item}-${index}`}
-                className="reel-row"
-                aria-hidden={index !== CENTER_INDEX}
-              >
+              <div key={`${title}-${item}-${index}`} className="reel-row">
                 <span className="reel-row-label">{item}</span>
               </div>
             ))}

@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useLocalState } from './hooks/useLocalState'
-import TopNav from './components/TopNav'
 import RulesPage from './pages/RulesPage'
 import ActivitiesPage from './pages/ActivitiesPage'
 import UnlocksPage from './pages/UnlocksPage'
@@ -149,7 +148,6 @@ export default function App() {
 
   return (
     <>
-      <TopNav nav={{ marks: availableMarks }} />
 
       <Routes>
         <Route path="/" element={<HomeRedirect />} />
