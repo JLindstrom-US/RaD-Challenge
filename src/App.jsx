@@ -6,57 +6,41 @@ import ActivitiesPage from './pages/ActivitiesPage'
 import UnlocksPage from './pages/UnlocksPage'
 import ExoticsPage from './pages/ExoticsPage'
 import DebugPage from './pages/DebugPage'
-import { STORAGE_KEY, allActivities, unlockGroups } from './data'
+import {
+  STORAGE_KEY,
+  allActivities,
+  unlockGroups,
+  defaultSubclassUnlocks,
+  defaultExotics,
+  defaultProgress
+} from './data'
 
 function HomeRedirect() {
   return <Navigate to="/rules" replace />
 }
 
-const defaultSubclassUnlocks = {
-  Solar: false,
-  Arc: false,
-  Void: false,
-  Stasis: false,
-  Strand: false,
-  Prismatic: false
-}
-
-const defaultExotics = {
-  weaponCount: 0,
-  armorCount: 0,
-  dismantledCount: 0,
-  dualDestinyCount: 0,
-  weaponWheelUrl: 'https://example.com/exotic-weapon-wheel',
-  armorWheelUrl: 'https://example.com/exotic-armor-wheel'
-}
-
-const defaultProgress = {
-  completions: {},
-  unlocks: {},
-  subclassUnlocks: defaultSubclassUnlocks,
-  freeSubclassName: null,
-  exotics: defaultExotics,
-  pointOverrideEnabled: false,
-  pointOverrideValue: 0,
-  selectedDifficulty: 'Easy',
-  selectedRuleset: 'default'
-}
-
 function calcActivityMarks(completions) {
   return Object.entries(completions || {}).reduce((sum, [name, count]) => {
-    const activity = allActivities.find((a) => a.name === name)
+    const activity = allActivities.find((item) => item.name === name)
     if (!activity) return sum
-    return sum + activity.marks + Math.max(0, Number(count || 0) - 1) * (activity.marks / 2)
+
+    const normalizedCount = Math.max(0, Number(count || 0))
+    if (normalizedCount === 0) return sum
+
+    return sum + activity.marks + Math.max(0, normalizedCount - 1) * (activity.marks / 2)
   }, 0)
 }
 
 function calcBaseUnlockMarks(unlocks) {
   return Object.entries(unlocks || {}).reduce((sum, [key, checked]) => {
     if (!checked) return sum
+
     const [group, indexString] = key.split(':')
     if (group === 'subclasses') return sum
+
     const index = Number(indexString)
     const item = unlockGroups[group]?.[index]
+
     return item ? sum - Number(item.cost || 0) : sum
   }, 0)
 }
@@ -68,8 +52,7 @@ function calcSubclassMarks(subclassUnlocks, freeSubclassName) {
     if (!unlocked) return sum
     if (name === 'Prismatic') return sum - 10
     if (freeEligible.includes(name)) {
-      if (name === freeSubclassName) return sum
-      return sum - 5
+      return name === freeSubclassName ? sum : sum - 5
     }
     return sum
   }, 0)
@@ -87,15 +70,15 @@ function calcExoticMarks(exotics) {
 export default function App() {
   const [progress, setProgress] = useLocalState(STORAGE_KEY, defaultProgress)
 
-  const completions = progress.completions || {}
-  const unlocks = progress.unlocks || {}
-  const subclassUnlocks = progress.subclassUnlocks || defaultSubclassUnlocks
-  const freeSubclassName = progress.freeSubclassName ?? null
-  const exotics = progress.exotics || defaultExotics
-  const pointOverrideEnabled = Boolean(progress.pointOverrideEnabled)
-  const pointOverrideValue = Number(progress.pointOverrideValue || 0)
-  const selectedDifficulty = progress.selectedDifficulty || 'Easy'
-  const selectedRuleset = progress.selectedRuleset || 'default'
+  const completions = progress?.completions || {}
+  const unlocks = progress?.unlocks || {}
+  const subclassUnlocks = progress?.subclassUnlocks || defaultSubclassUnlocks
+  const freeSubclassName = progress?.freeSubclassName ?? null
+  const exotics = progress?.exotics || defaultExotics
+  const pointOverrideEnabled = Boolean(progress?.pointOverrideEnabled)
+  const pointOverrideValue = Number(progress?.pointOverrideValue || 0)
+  const selectedDifficulty = progress?.selectedDifficulty || 'Easy'
+  const selectedRuleset = progress?.selectedRuleset || 'default'
 
   const activityMarks = calcActivityMarks(completions)
   const baseUnlockMarks = calcBaseUnlockMarks(unlocks)
@@ -106,14 +89,14 @@ export default function App() {
 
   const setCompletions = (updater) => {
     setProgress((prev) => {
-      const next = typeof updater === 'function' ? updater(prev.completions || {}) : updater
+      const next = typeof updater === 'function' ? updater(prev?.completions || {}) : updater
       return { ...prev, completions: next }
     })
   }
 
   const setUnlocks = (updater) => {
     setProgress((prev) => {
-      const next = typeof updater === 'function' ? updater(prev.unlocks || {}) : updater
+      const next = typeof updater === 'function' ? updater(prev?.unlocks || {}) : updater
       return { ...prev, unlocks: next }
     })
   }
@@ -121,10 +104,12 @@ export default function App() {
   const setSubclassState = (updater) => {
     setProgress((prev) => {
       const current = {
-        subclassUnlocks: prev.subclassUnlocks || defaultSubclassUnlocks,
-        freeSubclassName: prev.freeSubclassName ?? null
+        subclassUnlocks: prev?.subclassUnlocks || defaultSubclassUnlocks,
+        freeSubclassName: prev?.freeSubclassName ?? null
       }
+
       const next = typeof updater === 'function' ? updater(current) : updater
+
       return {
         ...prev,
         subclassUnlocks: next.subclassUnlocks,
@@ -135,7 +120,7 @@ export default function App() {
 
   const setExotics = (updater) => {
     setProgress((prev) => {
-      const next = typeof updater === 'function' ? updater(prev.exotics || defaultExotics) : updater
+      const next = typeof updater === 'function' ? updater(prev?.exotics || defaultExotics) : updater
       return { ...prev, exotics: next }
     })
   }
@@ -163,69 +148,79 @@ export default function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<HomeRedirect />} />
-      <Route
-        path="/rules"
-        element={
-          <RulesPage
-            nav={<TopNav availableMarks={availableMarks} />}
-            selectedDifficulty={selectedDifficulty}
-            selectedRuleset={selectedRuleset}
-            setSelectedDifficulty={setSelectedDifficulty}
-            setSelectedRuleset={setSelectedRuleset}
-          />
-        }
-      />
-      <Route
-        path="/activities"
-        element={
-          <ActivitiesPage
-            nav={<TopNav availableMarks={availableMarks} />}
-            completions={completions}
-            setCompletions={setCompletions}
-          />
-        }
-      />
-      <Route
-        path="/unlocks"
-        element={
-          <UnlocksPage
-            nav={<TopNav availableMarks={availableMarks} />}
-            unlocks={unlocks}
-            setUnlocks={setUnlocks}
-            subclassUnlocks={subclassUnlocks}
-            freeSubclassName={freeSubclassName}
-            setSubclassState={setSubclassState}
-          />
-        }
-      />
-      <Route
-        path="/exotics"
-        element={
-          <ExoticsPage
-            nav={<TopNav availableMarks={availableMarks} />}
-            exotics={exotics}
-            setExotics={setExotics}
-          />
-        }
-      />
-      <Route
-        path="/debug"
-        element={
-          <DebugPage
-            nav={<TopNav availableMarks={availableMarks} />}
-            pointOverrideEnabled={pointOverrideEnabled}
-            pointOverrideValue={pointOverrideValue}
-            setPointOverride={setPointOverride}
-            setProgress={setProgress}
-            completions={completions}
-            setCompletions={setCompletions}
-            activities={allActivities}
-          />
-        }
-      />
-      <Route path="*" element={<HomeRedirect />} />
-    </Routes>
+    <>
+      <TopNav nav={{ marks: availableMarks }} />
+
+      <Routes>
+        <Route path="/" element={<HomeRedirect />} />
+
+        <Route
+          path="/rules"
+          element={
+            <RulesPage
+              nav={{ marks: availableMarks }}
+              selectedDifficulty={selectedDifficulty}
+              selectedRuleset={selectedRuleset}
+              setSelectedDifficulty={setSelectedDifficulty}
+              setSelectedRuleset={setSelectedRuleset}
+            />
+          }
+        />
+
+        <Route
+          path="/activities"
+          element={
+            <ActivitiesPage
+              nav={{ marks: availableMarks }}
+              completions={completions}
+              setCompletions={setCompletions}
+            />
+          }
+        />
+
+        <Route
+          path="/unlocks"
+          element={
+            <UnlocksPage
+              nav={{ marks: availableMarks }}
+              unlocks={unlocks}
+              setUnlocks={setUnlocks}
+              subclassUnlocks={subclassUnlocks}
+              freeSubclassName={freeSubclassName}
+              setSubclassState={setSubclassState}
+            />
+          }
+        />
+
+        <Route
+          path="/exotics"
+          element={
+            <ExoticsPage
+              nav={{ marks: availableMarks }}
+              exotics={exotics}
+              setExotics={setExotics}
+            />
+          }
+        />
+
+        <Route
+          path="/debug"
+          element={
+            <DebugPage
+              nav={{ marks: availableMarks }}
+              pointOverrideEnabled={pointOverrideEnabled}
+              pointOverrideValue={pointOverrideValue}
+              setPointOverride={setPointOverride}
+              setProgress={setProgress}
+              completions={completions}
+              setCompletions={setCompletions}
+              activities={allActivities}
+            />
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/rules" replace />} />
+      </Routes>
+    </>
   )
 }

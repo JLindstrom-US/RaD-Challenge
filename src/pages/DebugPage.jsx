@@ -1,31 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Layout from '../components/Layout'
-
-const resetState = {
-  completions: {},
-  unlocks: {},
-  subclassUnlocks: {
-    Solar: false,
-    Arc: false,
-    Void: false,
-    Stasis: false,
-    Strand: false,
-    Prismatic: false
-  },
-  freeSubclassName: null,
-  exotics: {
-    weaponCount: 0,
-    armorCount: 0,
-    dismantledCount: 0,
-    dualDestinyCount: 0,
-    weaponWheelUrl: 'https://example.com/exotic-weapon-wheel',
-    armorWheelUrl: 'https://example.com/exotic-armor-wheel'
-  },
-  pointOverrideEnabled: false,
-  pointOverrideValue: 0,
-  selectedDifficulty: 'Easy',
-  selectedRuleset: 'default'
-}
+import { STORAGE_KEY, defaultProgress } from '../data'
 
 export default function DebugPage({
   nav,
@@ -39,9 +14,14 @@ export default function DebugPage({
 }) {
   const [value, setValue] = useState(String(pointOverrideValue))
 
+  useEffect(() => {
+    setValue(String(pointOverrideValue))
+  }, [pointOverrideValue])
+
   const applyOverride = () => {
     const parsed = Number(value)
     if (!Number.isFinite(parsed)) return
+
     setPointOverride({ enabled: true, value: parsed })
   }
 
@@ -54,9 +34,16 @@ export default function DebugPage({
     const ok = window.confirm(
       'Are you sure you want to reset everything? This will clear all progress and return the app to a first-time state.'
     )
+
     if (!ok) return
-    localStorage.removeItem('rad-progress-v1')
-    setProgress(resetState)
+
+    try {
+      window.localStorage.removeItem(STORAGE_KEY)
+    } catch {
+      // Ignore storage access failures.
+    }
+
+    setProgress(defaultProgress)
     setValue('0')
   }
 
@@ -78,39 +65,64 @@ export default function DebugPage({
     })
   }
 
+  const sortedActivities = [...activities].sort((a, b) => a.name.localeCompare(b.name))
+
   return (
     <Layout
       nav={nav}
       eyebrow="Debug"
-      title="Point Controls"
-      intro="Use this page to override total points or fully reset the tracker."
+      title="Debug Controls"
+      intro="Use these tools to override marks, adjust completions, or fully reset progress."
     >
       <section className="panel activity-panel">
         <h2>Manual Point Override</h2>
-        <p className="section-text">
-          Override Status: <strong>{pointOverrideEnabled ? 'Enabled' : 'Disabled'}</strong>
-        </p>
 
         <div className="debug-actions">
           <label className="field">
             <span>Total Points</span>
             <input
               type="number"
+              inputMode="numeric"
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={(event) => setValue(event.target.value)}
               placeholder="Enter total points"
             />
           </label>
 
-          <button className="primary-button" type="button" onClick={applyOverride}>
+          <button
+            type="button"
+            className="primary-button"
+            onClick={applyOverride}
+          >
             Set Total Points
           </button>
 
-          <button className="secondary-button" type="button" onClick={disableOverride}>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={disableOverride}
+          >
             Return to Calculated Total
           </button>
+        </div>
 
-          <button className="danger-button" type="button" onClick={resetEverything}>
+        <p className="section-text">
+          Override Status: {pointOverrideEnabled ? 'Enabled' : 'Disabled'}
+        </p>
+      </section>
+
+      <section className="panel activity-panel danger-panel">
+        <h2>Reset Progress</h2>
+        <p className="section-text">
+          This clears saved progress and restores the app to its default first-load state.
+        </p>
+
+        <div className="danger-actions">
+          <button
+            type="button"
+            className="danger-button"
+            onClick={resetEverything}
+          >
             Reset Everything
           </button>
         </div>
@@ -123,48 +135,40 @@ export default function DebugPage({
         </p>
 
         <div className="debug-counter-list">
-          {[...activities]
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((activity) => {
-              const count = Number(completions?.[activity.name] || 0)
+          {sortedActivities.map((activity) => {
+            const count = Number(completions?.[activity.name] || 0)
 
-              return (
-                <div className="debug-counter-row" key={activity.name}>
-                  <div className="debug-counter-copy">
-                    <span className="debug-counter-name">{activity.name}</span>
-                    <span className="debug-counter-meta">{activity.marks} Marks</span>
-                  </div>
-
-                  <div className="debug-stepper">
-                    <button
-                      type="button"
-                      className="stepper-button"
-                      onClick={() => adjustCompletion(activity.name, -1)}
-                      aria-label={`Decrease completions for ${activity.name}`}
-                    >
-                      -
-                    </button>
-
-                    <input
-                      className="stepper-value"
-                      type="number"
-                      value={count}
-                      readOnly
-                      aria-label={`Completions for ${activity.name}`}
-                    />
-
-                    <button
-                      type="button"
-                      className="stepper-button"
-                      onClick={() => adjustCompletion(activity.name, 1)}
-                      aria-label={`Increase completions for ${activity.name}`}
-                    >
-                      +
-                    </button>
-                  </div>
+            return (
+              <div key={activity.name} className="debug-counter-row">
+                <div className="debug-counter-copy">
+                  <span className="debug-counter-name">{activity.name}</span>
+                  <span className="debug-counter-meta">{activity.marks} Marks</span>
                 </div>
-              )
-            })}
+
+                <div className="debug-stepper">
+                  <button
+                    type="button"
+                    className="stepper-button"
+                    onClick={() => adjustCompletion(activity.name, -1)}
+                    aria-label={`Decrease completions for ${activity.name}`}
+                  >
+                    -
+                  </button>
+
+                  <strong className="stepper-value">{count}</strong>
+
+                  <button
+                    type="button"
+                    className="stepper-button"
+                    onClick={() => adjustCompletion(activity.name, 1)}
+                    aria-label={`Increase completions for ${activity.name}`}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </section>
     </Layout>

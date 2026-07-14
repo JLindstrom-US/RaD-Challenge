@@ -1,5 +1,33 @@
 export const STORAGE_KEY = 'rad-progress-v1'
 
+export const defaultSubclassUnlocks = {
+  Solar: false,
+  Arc: false,
+  Void: false,
+  Stasis: false,
+  Strand: false,
+  Prismatic: false
+}
+
+export const defaultExotics = {
+  weaponCount: 0,
+  armorCount: 0,
+  dismantledCount: 0,
+  dualDestinyCount: 0
+}
+
+export const defaultProgress = {
+  completions: {},
+  unlocks: {},
+  subclassUnlocks: defaultSubclassUnlocks,
+  freeSubclassName: null,
+  exotics: defaultExotics,
+  pointOverrideEnabled: false,
+  pointOverrideValue: 0,
+  selectedDifficulty: 'Easy',
+  selectedRuleset: 'default'
+}
+
 export const raids = [
   { name: 'Last Wish', marks: 2 },
   { name: 'Garden of Salvation', marks: 2 },
@@ -46,13 +74,13 @@ export const dungeons = [
 export const allActivities = [...raids, ...dungeons]
 
 export const rules = {
-  Default: [
+  default: [
     'Must be a "Fresh" Character — No Vault Allowed. Start with White Rarity Gear from Collections.',
     'You can only use Raid and Dungeon Drops. No World Drops.',
     'No Checkpoints. Full Clears Only.',
     'You may use any Exotic Armor or Weapons from Collections.'
   ],
-  Expert: [
+  expert: [
     'Must be a "Fresh" Character — No Vault Allowed. Start with White Rarity Gear from Collections.',
     'You can only use Raid and Dungeon Drops. No World Drops.',
     'No Checkpoints. Full Clears Only.',
@@ -66,22 +94,26 @@ export const goals = [
   {
     tier: 'Easy',
     title: 'Complete Each Dungeon Solo without Dying',
-    description: 'Complete Every Dungeon Solo without Dying on Any Difficulty. Deathless Completions do NOT have to be Back-to-Back.'
+    description:
+      'Complete every dungeon solo without dying on any difficulty. Deathless completions do not have to be back-to-back.'
   },
   {
     tier: 'Medium',
     title: 'Complete Each Raid and Dungeon without Dying',
-    description: 'Complete Every Dungeon and Raid without Dying on Any Difficulty. Deathless Completions do NOT have to be Back-to-Back.'
+    description:
+      'Complete every dungeon and raid without dying on any difficulty. Deathless completions do not have to be back-to-back.'
   },
   {
     tier: 'Hard',
     title: 'Complete All Pantheons without Dying',
-    description: 'Complete All 3 Pantheons without Dying on Default Difficulty. Deathless Completions MUST be Back-to-Back.'
+    description:
+      'Complete all 3 Pantheons without dying on default difficulty. Deathless completions must be back-to-back.'
   },
   {
     tier: 'Impossible',
     title: 'Complete All Dungeons Solo without Dying',
-    description: 'Complete All Dungeons Solo without Dying on Any Difficulty. Deathless Completions MUST be Back-to-Back.'
+    description:
+      'Complete all dungeons solo without dying on any difficulty. Deathless completions must be back-to-back.'
   }
 ]
 

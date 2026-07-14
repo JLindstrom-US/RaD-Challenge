@@ -4,8 +4,16 @@ import { rules, goals } from '../data'
 import { faqs } from '../data/faqs'
 
 const rulesetOptions = [
-  { id: 'Default', label: 'Default Ruleset', description: 'Basic Fresh-Character Rules.' },
-  { id: 'Expert', label: 'Expert Ruleset', description: 'Adds Subclass, Relic, and Exotic Restrictions.' }
+  {
+    id: 'default',
+    label: 'Default Ruleset',
+    description: 'Basic fresh-character rules.'
+  },
+  {
+    id: 'expert',
+    label: 'Expert Ruleset',
+    description: 'Adds subclass, relic, and exotic restrictions.'
+  }
 ]
 
 export default function RulesPage({
@@ -15,36 +23,50 @@ export default function RulesPage({
   setSelectedDifficulty,
   setSelectedRuleset
 }) {
-  const activeRules = useMemo(() => rules[selectedRuleset] || rules.default, [selectedRuleset])
+  const activeRules = useMemo(() => {
+    return rules[selectedRuleset] || rules.default
+  }, [selectedRuleset])
 
   return (
     <Layout
       nav={nav}
       eyebrow="Rules"
-      title="Choose Your Challenge"
-      intro="Pick a Goal and Ruleset."
+      title="Challenge Rules"
+      intro="Choose your goal and ruleset, then review the active rules before you start tracking progress."
     >
       <section className="panel activity-panel">
-        <h2>Select Your Goal</h2>
+        <div className="section-header">
+          <h2>Select Your Goal</h2>
+          <p className="section-text">
+            Pick the challenge tier you want to run.
+          </p>
+        </div>
+
         <div className="choice-grid">
           {goals.map((option) => (
             <button
-              key={option.title}
+              key={option.tier}
               type="button"
               className={`choice-card ${selectedDifficulty === option.tier ? 'selected' : ''}`}
               onClick={() => setSelectedDifficulty(option.tier)}
               aria-pressed={selectedDifficulty === option.tier}
             >
               <span className="choice-label">{option.tier}</span>
-              <span className="choice-description">{option.title}</span>
-              <span className="choice-note">{option.description}</span>
+              <strong>{option.title}</strong>
+              <span className="choice-description">{option.description}</span>
             </button>
           ))}
         </div>
       </section>
 
       <section className="panel activity-panel">
-        <h2>Ruleset</h2>
+        <div className="section-header">
+          <h2>Ruleset</h2>
+          <p className="section-text">
+            Switch between the standard and restricted challenge formats.
+          </p>
+        </div>
+
         <div className="choice-grid">
           {rulesetOptions.map((option) => (
             <button
@@ -62,25 +84,31 @@ export default function RulesPage({
       </section>
 
       <section className="panel activity-panel">
-        <h2>Selected Rules</h2>
-        <p className="section-text">
-          Goal: <strong>{selectedDifficulty}</strong> · Ruleset: <strong>{selectedRuleset}</strong>
-        </p>
-        <div className="rules-list">
+        <div className="section-header">
+          <h2>Selected Rules</h2>
+          <p className="section-text">
+            Goal: {selectedDifficulty} · Ruleset: {selectedRuleset}
+          </p>
+        </div>
+
+        <div>
           {activeRules.map((rule, index) => (
-            <article className="rule-row" key={index}>
+            <div key={rule} className="rule-row">
               <span className="rule-index">{index + 1}</span>
               <p>{rule}</p>
-            </article>
+            </div>
           ))}
         </div>
       </section>
 
       <section className="panel activity-panel">
-        <h2>FAQ</h2>
+        <div className="section-header">
+          <h2>FAQ</h2>
+        </div>
+
         <div className="faq-list">
           {faqs.map((item, index) => (
-            <details className="faq-item" key={`${item.question}-${index}`}>
+            <details key={`${item.question}-${index}`} className="faq-item">
               <summary>{item.question}</summary>
               <p>{item.answer}</p>
             </details>

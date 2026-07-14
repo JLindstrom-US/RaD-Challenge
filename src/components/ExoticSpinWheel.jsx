@@ -3,7 +3,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 const ROW_HEIGHT = 64
 const VISIBLE_ROWS = 3
 const CENTER_INDEX = Math.floor(VISIBLE_ROWS / 2)
-const SPIN_LOOPS = 5
+const SPIN_LOOPS = 6
+const SPIN_DURATION_MS = 5200
 
 function normalizeItems(items) {
   return Array.isArray(items) ? items.filter(Boolean) : []
@@ -14,6 +15,7 @@ function buildReelItems(items) {
 
   const before = Array.from({ length: SPIN_LOOPS }, () => items).flat()
   const after = Array.from({ length: 2 }, () => items).flat()
+
   return [...before, ...items, ...after]
 }
 
@@ -40,6 +42,14 @@ export default function ExoticSpinWheel({ title, items = [] }) {
       }
     }
   }, [title, safeItems])
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
 
   const handleSpin = () => {
     if (!safeItems.length || isSpinning) return
@@ -70,35 +80,32 @@ export default function ExoticSpinWheel({ title, items = [] }) {
     timeoutRef.current = window.setTimeout(() => {
       setSelectedItem(winner)
       setIsSpinning(false)
-    }, 5200)
+    }, SPIN_DURATION_MS)
   }
 
   return (
-    <div className="wheel-card reel-card">
+    <div className="wheel-shell">
       <div className="wheel-card-head">
-        <h3>{title}</h3>
-        <p className="section-text">
-          {safeItems.length ? `${safeItems.length} possible results` : 'No items loaded yet.'}
-        </p>
+        <span className="wheel-kicker">
+          {safeItems.length ? `${safeItems.length} possible results` : 'No items loaded yet'}
+        </span>
       </div>
 
-      <div className="reel-shell">
-        <div className="reel-fade reel-fade--top" aria-hidden="true" />
-        <div className="reel-fade reel-fade--bottom" aria-hidden="true" />
-
-        <div className="reel-window" aria-label={title}>
-          <div className="reel-center-highlight" aria-hidden="true" />
+      <div className="reel-shell" aria-live="polite">
+        <div className="reel-window">
+          <div className="reel-fade reel-fade--top" />
+          <div className="reel-center-highlight" />
+          <div className="reel-fade reel-fade--bottom" />
 
           <div
             className={`reel-track ${transitionEnabled ? 'is-animated' : ''}`}
-            style={{
-              transform: `translateY(${translateY}px)`
-            }}
+            style={{ transform: `translateY(${translateY}px)` }}
           >
             {reelItems.map((item, index) => (
               <div
-                key={`${item}-${index}`}
+                key={`${title}-${item}-${index}`}
                 className="reel-row"
+                aria-hidden={index !== CENTER_INDEX}
               >
                 <span className="reel-row-label">{item}</span>
               </div>
@@ -114,14 +121,14 @@ export default function ExoticSpinWheel({ title, items = [] }) {
           onClick={handleSpin}
           disabled={!safeItems.length || isSpinning}
         >
-          {isSpinning ? 'Spinning...' : 'Spin Reel'}
+          {isSpinning ? 'Spinning…' : `Spin ${title}`}
         </button>
       </div>
 
-      <div className="wheel-result" aria-live="polite">
+      <div className="wheel-result">
         <span className="wheel-result-label">Selected Exotic</span>
         <strong className="wheel-result-value">
-          {selectedItem || (isSpinning ? 'Rolling...' : 'Spin to reveal')}
+          {selectedItem || 'Spin the wheel to reveal a result.'}
         </strong>
       </div>
     </div>

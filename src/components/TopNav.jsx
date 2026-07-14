@@ -8,7 +8,9 @@ const links = [
   { to: '/debug', label: 'Debug' }
 ]
 
-export default function TopNav({ availableMarks = 0 }) {
+export default function TopNav({ nav }) {
+  const availableMarks = Number(nav?.marks || 0)
+
   return (
     <header className="topbar panel">
       <div className="brand-lockup">
@@ -18,11 +20,13 @@ export default function TopNav({ availableMarks = 0 }) {
           <p className="brand-sub">Raid and Dungeon Challenge Tracker</p>
         </div>
       </div>
+
       <nav className="tabs" aria-label="Primary">
         <div className="marks-pill" aria-label="Available Marks">
           <span className="marks-label">Available Marks</span>
           <strong>{availableMarks}</strong>
         </div>
+
         {links.map((link) => (
           <NavLink
             key={link.to}

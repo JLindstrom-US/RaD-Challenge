@@ -15,21 +15,24 @@ function CounterRow({ label, value, onAdd, onRemove, note }) {
         <span className="unlock-name">{label}</span>
         {note ? <span className="unlock-cost">{note}</span> : null}
       </div>
+
       <div className="counter-controls">
         <button
           type="button"
-          className="secondary-button"
+          className="stepper-button"
           onClick={onRemove}
-          aria-label={`Remove one ${label}`}
+          aria-label={`Decrease ${label}`}
         >
           -
         </button>
+
         <strong className="counter-value">{value}</strong>
+
         <button
           type="button"
-          className="secondary-button"
+          className="stepper-button"
           onClick={onAdd}
-          aria-label={`Add one ${label}`}
+          aria-label={`Increase ${label}`}
         >
           +
         </button>
@@ -38,125 +41,160 @@ function CounterRow({ label, value, onAdd, onRemove, note }) {
   )
 }
 
-function ClassSelector({ value, onChange }) {
-  const options = ['Hunter', 'Warlock', 'Titan']
-
-  return (
-    <fieldset className="class-selector">
-      <legend className="class-selector-label">Armor Class</legend>
-      <div className="class-selector-options" role="radiogroup" aria-label="Armor class">
-        {options.map((option) => {
-          const checked = value === option
-
-          return (
-            <label
-              key={option}
-              className={`class-chip ${checked ? 'is-selected' : ''}`}
-            >
-              <input
-                className="sr-only"
-                type="radio"
-                name="armor-class"
-                value={option}
-                checked={checked}
-                onChange={() => onChange(option)}
-              />
-              <span>{option}</span>
-            </label>
-          )
-        })}
-      </div>
-    </fieldset>
-  )
-}
+const classOptions = [
+  { id: 'hunter', label: 'Hunter' },
+  { id: 'titan', label: 'Titan' },
+  { id: 'warlock', label: 'Warlock' }
+]
 
 export default function ExoticsPage({ nav, exotics, setExotics }) {
-  const weaponCount = Number(exotics.weaponCount || 0)
-  const armorCount = Number(exotics.armorCount || 0)
-  const dismantledCount = Number(exotics.dismantledCount || 0)
-  const dualDestinyCount = Number(exotics.dualDestinyCount || 0)
-
-  const [selectedClass, setSelectedClass] = useState('Hunter')
-
-  const update = (patch) => setExotics((prev) => ({ ...prev, ...patch }))
+  const [selectedClass, setSelectedClass] = useState('hunter')
 
   const armorItems = useMemo(() => {
-    if (selectedClass === 'Titan') return exoticArmorTitan
-    if (selectedClass === 'Warlock') return exoticArmorWarlock
-    return exoticArmorHunter
+    switch (selectedClass) {
+      case 'titan':
+        return exoticArmorTitan
+      case 'warlock':
+        return exoticArmorWarlock
+      case 'hunter':
+      default:
+        return exoticArmorHunter
+    }
   }, [selectedClass])
+
+  const armorTitle = useMemo(() => {
+    switch (selectedClass) {
+      case 'titan':
+        return 'Titan Armor Wheel'
+      case 'warlock':
+        return 'Warlock Armor Wheel'
+      case 'hunter':
+      default:
+        return 'Hunter Armor Wheel'
+    }
+  }, [selectedClass])
+
+  const updateExotics = (updater) => {
+    setExotics((prev) => {
+      const current = prev || {
+        weaponCount: 0,
+        armorCount: 0,
+        dismantledCount: 0,
+        dualDestinyCount: 0
+      }
+
+      return typeof updater === 'function' ? updater(current) : updater
+    })
+  }
+
+  const adjustCount = (key, delta) => {
+    updateExotics((prev) => ({
+      ...prev,
+      [key]: Math.max(0, Number(prev?.[key] || 0) + delta)
+    }))
+  }
 
   return (
     <Layout
       nav={nav}
       eyebrow="Exotics"
-      title="Exotic Redemptions"
-      intro="Spend Marks to unlock Exotics, and earn Marks for dismantling them."
+      title="Exotic Tracking"
+      intro="Spin for a random exotic weapon, then choose a class to spin for matching exotic armor."
     >
       <section className="panel activity-panel">
-        <div className="wheel-section-header">
+        <div className="section-header wheel-section-header">
           <div>
-            <h2>Exotic Wheels</h2>
+            <h2>Animated Wheels</h2>
             <p className="section-text">
-              Spin for a random Exotic weapon, then choose your class to spin for matching Exotic armor.
+              The weapon wheel is shared. The armor wheel changes based on the selected class.
             </p>
           </div>
 
-          <ClassSelector value={selectedClass} onChange={setSelectedClass} />
+          <fieldset className="class-selector">
+            <legend className="class-selector-label">Armor Class</legend>
+
+            <div className="class-selector-options">
+              {classOptions.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`class-chip ${selectedClass === option.id ? 'is-selected' : ''}`}
+                  onClick={() => setSelectedClass(option.id)}
+                  aria-pressed={selectedClass === option.id}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
         </div>
 
-        <div className="wheel-grid wheel-grid--interactive">
-          <ExoticSpinWheel
-            title="Exotic Weapon Wheel"
-            items={exoticWeapons}
-            storageKey="weapon-wheel"
-          />
+        <div className="wheel-grid--interactive">
+          <div className="wheel-card">
+            <div className="wheel-card-head">
+              <span className="wheel-kicker">Shared pool</span>
+              <h3>Weapon Wheel</h3>
+            </div>
 
-          <ExoticSpinWheel
-            key={selectedClass}
-            title={`${selectedClass} Exotic Armor Wheel`}
-            items={armorItems}
-            storageKey={`armor-wheel-${selectedClass.toLowerCase()}`}
-          />
+            <ExoticSpinWheel
+              title="Weapon Wheel"
+              items={exoticWeapons}
+            />
+          </div>
+
+          <div className="wheel-card">
+            <div className="wheel-card-head">
+              <span className="wheel-kicker">Class-specific pool</span>
+              <h3>{armorTitle}</h3>
+            </div>
+
+            <ExoticSpinWheel
+              title={armorTitle}
+              items={armorItems}
+            />
+          </div>
         </div>
       </section>
 
       <section className="panel activity-panel">
-        <h2>Exotic Tracking</h2>
-        <div className="counter-stack">
-          <CounterRow
-            label="Exotic Weapons"
-            value={weaponCount}
-            note="5 Marks Each"
-            onAdd={() => update({ weaponCount: weaponCount + 1 })}
-            onRemove={() => update({ weaponCount: Math.max(0, weaponCount - 1) })}
-          />
-          <CounterRow
-            label="Exotic Armor"
-            value={armorCount}
-            note="5 Marks Each"
-            onAdd={() => update({ armorCount: armorCount + 1 })}
-            onRemove={() => update({ armorCount: Math.max(0, armorCount - 1) })}
-          />
+        <div className="section-header">
+          <h2>Exotic Costs</h2>
+          <p className="section-text">
+            Track purchased exotics, dismantled refunds, and Dual Destiny class item unlocks.
+          </p>
         </div>
-      </section>
 
-      <section className="panel activity-panel">
-        <h2>Extra Redemptions</h2>
         <div className="counter-stack">
+          <CounterRow
+            label="Weapon Exotics Purchased"
+            value={Number(exotics?.weaponCount || 0)}
+            note="Costs 5 Marks each"
+            onAdd={() => adjustCount('weaponCount', 1)}
+            onRemove={() => adjustCount('weaponCount', -1)}
+          />
+
+          <CounterRow
+            label="Armor Exotics Purchased"
+            value={Number(exotics?.armorCount || 0)}
+            note="Costs 5 Marks each"
+            onAdd={() => adjustCount('armorCount', 1)}
+            onRemove={() => adjustCount('armorCount', -1)}
+          />
+
           <CounterRow
             label="Dismantled Exotics"
-            value={dismantledCount}
-            note="Adds 1 Mark Each"
-            onAdd={() => update({ dismantledCount: dismantledCount + 1 })}
-            onRemove={() => update({ dismantledCount: Math.max(0, dismantledCount - 1) })}
+            value={Number(exotics?.dismantledCount || 0)}
+            note="Refunds 1 Mark each"
+            onAdd={() => adjustCount('dismantledCount', 1)}
+            onRemove={() => adjustCount('dismantledCount', -1)}
           />
+
           <CounterRow
-            label="Dual Destiny"
-            value={dualDestinyCount}
-            note="5 Marks Each"
-            onAdd={() => update({ dualDestinyCount: dualDestinyCount + 1 })}
-            onRemove={() => update({ dualDestinyCount: Math.max(0, dualDestinyCount - 1) })}
+            label="Dual Destiny Class Items"
+            value={Number(exotics?.dualDestinyCount || 0)}
+            note="Costs 5 Marks each"
+            onAdd={() => adjustCount('dualDestinyCount', 1)}
+            onRemove={() => adjustCount('dualDestinyCount', -1)}
           />
         </div>
       </section>
