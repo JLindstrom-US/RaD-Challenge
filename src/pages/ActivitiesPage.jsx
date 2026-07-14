@@ -2,19 +2,24 @@ import { useEffect, useMemo, useState } from 'react'
 import Layout from '../components/Layout'
 import { allActivities } from '../data'
 
-function normalizeType(value) {
+function cleanString(value) {
   return String(value || '')
+    .normalize('NFKC')
     .trim()
     .toLowerCase()
 }
 
 function getActivityType(activity) {
-  const explicitType = normalizeType(activity?.type)
+  const rawType = cleanString(activity?.type)
+  const rawCategory = cleanString(activity?.category)
+  const rawKind = cleanString(activity?.kind)
 
-  if (explicitType === 'raid' || explicitType === 'raids') return 'raid'
-  if (explicitType === 'dungeon' || explicitType === 'dungeons') return 'dungeon'
+  const value = rawType || rawCategory || rawKind
 
-  return activity?.marks >= 2 ? 'raid' : 'dungeon'
+  if (value === 'raid' || value === 'raids') return 'raid'
+  if (value === 'dungeon' || value === 'dungeons') return 'dungeon'
+
+  return 'dungeon'
 }
 
 function ActivityList({ title, items, completions }) {
@@ -53,7 +58,9 @@ export default function ActivitiesPage({ nav, completions, setCompletions }) {
     const dungeons = []
 
     for (const activity of allActivities) {
-      if (getActivityType(activity) === 'raid') {
+      const resolvedType = getActivityType(activity)
+
+      if (resolvedType === 'raid') {
         raids.push(activity)
       } else {
         dungeons.push(activity)
