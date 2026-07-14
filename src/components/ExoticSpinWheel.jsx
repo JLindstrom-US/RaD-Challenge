@@ -1,100 +1,109 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
-const sliceColors = [
-  '#7c3aed',
-  '#2563eb',
-  '#0891b2',
-  '#059669',
-  '#ca8a04',
-  '#ea580c',
-  '#dc2626',
-  '#db2777'
-]
+const ROW_HEIGHT = 64
+const VISIBLE_ROWS = 3
+const CENTER_INDEX = Math.floor(VISIBLE_ROWS / 2)
+const SPIN_LOOPS = 5
 
-function buildWheelGradient(count) {
-  if (!count) return 'transparent'
+function normalizeItems(items) {
+  return Array.isArray(items) ? items.filter(Boolean) : []
+}
 
-  const step = 360 / count
-  const stops = Array.from({ length: count }, (_, index) => {
-    const start = index * step
-    const end = start + step
-    const color = sliceColors[index % sliceColors.length]
-    return `${color} ${start}deg ${end}deg`
-  })
+function buildReelItems(items) {
+  if (!items.length) return []
 
-  return `conic-gradient(from -90deg, ${stops.join(', ')})`
+  const before = Array.from({ length: SPIN_LOOPS }, () => items).flat()
+  const after = Array.from({ length: 2 }, () => items).flat()
+  return [...before, ...items, ...after]
 }
 
 export default function ExoticSpinWheel({ title, items = [] }) {
-  const [rotation, setRotation] = useState(0)
-  const [selectedItem, setSelectedItem] = useState(null)
+  const safeItems = useMemo(() => normalizeItems(items), [items])
+  const reelItems = useMemo(() => buildReelItems(safeItems), [safeItems])
+
   const [isSpinning, setIsSpinning] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
+  const [translateY, setTranslateY] = useState(0)
+  const [transitionEnabled, setTransitionEnabled] = useState(false)
 
-  const safeItems = Array.isArray(items) ? items.filter(Boolean) : []
-  const count = safeItems.length
-  const sliceAngle = count ? 360 / count : 0
+  const timeoutRef = useRef(null)
 
-  const background = useMemo(() => buildWheelGradient(count), [count])
+  useEffect(() => {
+    setSelectedItem(null)
+    setIsSpinning(false)
+    setTransitionEnabled(false)
+    setTranslateY(0)
+
+    return () => {
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [title, safeItems])
 
   const handleSpin = () => {
-    if (!count || isSpinning) return
+    if (!safeItems.length || isSpinning) return
 
-    const selectedIndex = Math.floor(Math.random() * count)
-    const fullSpins = 360 * 6
-    const targetCenterAngle = selectedIndex * sliceAngle + sliceAngle / 2
-    const nextRotation = rotation + fullSpins + (360 - targetCenterAngle)
+    const randomIndex = Math.floor(Math.random() * safeItems.length)
+    const winner = safeItems[randomIndex]
+
+    const baseIndex = safeItems.length * SPIN_LOOPS
+    const targetIndex = baseIndex + randomIndex
+    const targetOffset = (targetIndex - CENTER_INDEX) * ROW_HEIGHT
+
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current)
+    }
 
     setIsSpinning(true)
     setSelectedItem(null)
-    setRotation(nextRotation)
+    setTransitionEnabled(false)
+    setTranslateY(0)
 
-    window.setTimeout(() => {
-      setSelectedItem(safeItems[selectedIndex])
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        setTransitionEnabled(true)
+        setTranslateY(-targetOffset)
+      })
+    })
+
+    timeoutRef.current = window.setTimeout(() => {
+      setSelectedItem(winner)
       setIsSpinning(false)
     }, 5200)
   }
 
   return (
-    <div className="wheel-card">
+    <div className="wheel-card reel-card">
       <div className="wheel-card-head">
         <h3>{title}</h3>
         <p className="section-text">
-          {count ? `${count} possible results` : 'No items loaded yet.'}
+          {safeItems.length ? `${safeItems.length} possible results` : 'No items loaded yet.'}
         </p>
       </div>
 
-      <div className="wheel-stage">
-        <div className="wheel-pointer" aria-hidden="true" />
-        <div
-          className={`spin-wheel ${isSpinning ? 'is-spinning' : ''}`}
-          style={{
-            background,
-            transform: `rotate(${rotation}deg)`
-          }}
-          aria-label={title}
-        >
-          {safeItems.map((item, index) => {
-            const angle = index * sliceAngle
-            return (
-              <div
-                key={item}
-                className="wheel-slice-label"
-                style={{
-                  transform: `rotate(${angle}deg)`
-                }}
-              >
-                <span
-                  style={{
-                    transform: `translateX(-50%) rotate(${sliceAngle / 2}deg)`
-                  }}
-                >
-                  {item}
-                </span>
-              </div>
-            )
-          })}
+      <div className="reel-shell">
+        <div className="reel-fade reel-fade--top" aria-hidden="true" />
+        <div className="reel-fade reel-fade--bottom" aria-hidden="true" />
 
-          <div className="wheel-center-cap" aria-hidden="true" />
+        <div className="reel-window" aria-label={title}>
+          <div className="reel-center-highlight" aria-hidden="true" />
+
+          <div
+            className={`reel-track ${transitionEnabled ? 'is-animated' : ''}`}
+            style={{
+              transform: `translateY(${translateY}px)`
+            }}
+          >
+            {reelItems.map((item, index) => (
+              <div
+                key={`${item}-${index}`}
+                className="reel-row"
+              >
+                <span className="reel-row-label">{item}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -103,9 +112,9 @@ export default function ExoticSpinWheel({ title, items = [] }) {
           type="button"
           className="primary-button"
           onClick={handleSpin}
-          disabled={!count || isSpinning}
+          disabled={!safeItems.length || isSpinning}
         >
-          {isSpinning ? 'Spinning...' : 'Spin Wheel'}
+          {isSpinning ? 'Spinning...' : 'Spin Reel'}
         </button>
       </div>
 
