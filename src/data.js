@@ -31,7 +31,7 @@ export const defaultProgress = {
 export const raids = [
   { name: 'Last Wish', marks: 2 },
   { name: 'Garden of Salvation', marks: 2 },
-  { name: 'Deep Stone Crypt - Normal', marks: 2 },
+  { name: 'Deep Stone Crypt', marks: 2 },
   { name: 'Vault of Glass - Normal', marks: 2 },
   { name: 'Vault of Glass - Master', marks: 3 },
   { name: 'Vow of the Disciple - Normal', marks: 2 },
